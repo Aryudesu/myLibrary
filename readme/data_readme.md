@@ -74,14 +74,18 @@ RunLengthクラスの作成を行います．初期はデータは空です．
 
 Trie木
 
-### trie_tree()
+### Trie()
 
-trie_treeクラスの作成を行います．
+Trieクラスの作成を行います．
 
 ### insert(value)
 
 文字列データの追加を行います．
 
-### get_max_lcp(value)
+### search(word)
 
-LCPの最大値を取得します
+指定の文字列が存在するかを判定します
+
+### starts_with(prefix)
+
+先頭一致でデータの取得を行います

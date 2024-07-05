@@ -1,67 +1,46 @@
-class trie_tree():
-    """
-    Trie木
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+        self.count = 0
 
-    -----
-    Created By Aryu
-    """
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+        self.total = 0
 
-    def __init__(self) -> None:
-        self.tree = dict()
+    def insert(self, word):
+        """データの挿入を行います"""
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            self.total += node.count
+            node.count += 1
+        node.is_end_of_word = True
 
-    def insert(self, value) -> None:
-        """
-        文字列データを追加します
+    def search(self, word):
+        """データの検索を行います"""
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
 
-        parameter
-        -----
-        value: string
+    def starts_with(self, prefix):
+        """先頭一致でデータの取得を行います"""
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
 
-        response
-        -----
-        None
-        """
-        graph = self.tree
-        for v in value:
-            tmp = graph.get(v, {})
-            graph[v] = tmp
-            cost = tmp.get("num", 0)
-            tmp["num"] = cost + 1
-            graph = tmp
-        graph["end"] = True
-
-    def get_max_lcp(self, value) -> None:
-        """
-        LCPの最大値を取得します
-
-        parameter
-        -----
-        value: string
-
-        response
-        -----
-        int
-        """
-        graph = self.tree
-        result = 0
-        for v in value:
-            tmp = graph.get(v, {})
-            num = tmp.get("num", 0)
-            if num <= 1:
-                break
-            result += 1
-            graph = tmp
-        return result
-
-
-# *** Example (ABC387 E) ***
-tt = trie_tree()
 N = int(input())
-S = []
-for n in range(N):
-    s = input()
-    S.append(s)
-    tt.insert(s)
+S = input().split()
+trie = Trie()
 for s in S:
-    res = tt.get_max_lcp(s)
-    print(res)
+    trie.insert(s)
+print(trie.total)
