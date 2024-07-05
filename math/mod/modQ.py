@@ -190,7 +190,6 @@ class modQ:
         return self.numer, self.denom
 
 # *** Example (ABC360 E) ***
-
 N, K = [int(l) for l in input().split()]
 dp1 = modQ(1)
 dp2 = modQ(0)

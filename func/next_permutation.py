@@ -18,7 +18,7 @@ def next_permutation(data):
         right -= 1
     return 1
 
-
+# *** Example (ABC276 C) ***
 size = 4
 data = [10 + i for i in range(size)]
 for i in range(size):
