@@ -18,7 +18,7 @@ class RunLength:
             self.data.append([x, n])
 
     def popData(self, n):
-        """入れたものを入れた先からn個取得"""
+        """末尾からn個取得"""
         tmpN = n
         result = []
         while True:

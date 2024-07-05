@@ -19,23 +19,23 @@ class Queue:
             self.pointerR += 1
 
     def dequeueL(self):
-        """左からデータの取り出し・削除"""
+        """先頭のデータを取得し，削除します"""
         res = self.data[self.pointerL]
         self.pointerL += 1
         return res
 
     def dequeueR(self):
-        """右からデータの取り出し・削除"""
+        """末尾のデータを取得し，削除します"""
         res = self.data[self.pointerR - 1]
         self.pointerR -= 1
         return res
 
     def getL(self):
-        """左のデータの取り出し"""
+        """先頭のデータの取得を行います"""
         return self.data[self.pointerL]
 
     def getR(self):
-        """右のデータの取り出し"""
+        """末尾のデータの取得を行います"""
         return self.data[self.pointerR - 1]
 
 # *** Example (プログラミングの鉄則 A52) ***
