@@ -6,14 +6,14 @@
 
 挿入可能なリスト
 
-### queue
+## queue
 
 キューの挙動の実装
 
-### run_length
+## run_length
 
 ランレングス圧縮
 
-### trie_tree
+## trie_tree
 
 Trie木
