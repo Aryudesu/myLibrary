@@ -58,7 +58,7 @@ class InsertableList:
             num = tmp[1]
         return result
 
-
+# *** Example (ABC344 E) ***
 N = int(input())
 A = [int(l) for l in input().split()]
 IL = InsertableList(A)
