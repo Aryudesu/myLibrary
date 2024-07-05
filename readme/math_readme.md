@@ -2,11 +2,12 @@
 
 ## mod/inverse_mod
 
-modについての逆数の計算
+modについての逆数の計算を行う基本的関数
 
 ## mod/modQ
 
-有理数についてmodを考えるもの
+有理数modについてのクラス
+基本的な四則演算と整数冪については実装．
 
 ## prime/divisor
 
