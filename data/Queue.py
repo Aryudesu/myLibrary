@@ -16,6 +16,7 @@ class Queue:
             self.pointerR += 1
         else:
             self.data.append(a)
+            self.pointerR += 1
 
     def dequeueL(self):
         """左からデータの取り出し・削除"""
@@ -25,7 +26,7 @@ class Queue:
 
     def dequeueR(self):
         """右からデータの取り出し・削除"""
-        res = self.data[self.pointerR]
+        res = self.data[self.pointerR - 1]
         self.pointerR -= 1
         return res
 
@@ -35,8 +36,9 @@ class Queue:
 
     def getR(self):
         """右のデータの取り出し"""
-        return self.data[self.pointerR]
+        return self.data[self.pointerR - 1]
 
+# *** Example (プログラミングの鉄則 A52) ***
 Q = int(input())
 qu = Queue()
 result = []
