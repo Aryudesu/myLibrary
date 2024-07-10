@@ -34,7 +34,7 @@ class bisectMapper:
             return 0
         return bisect.bisect_left(self.data, a)
 
-    def data_lq(self, a):
+    def data_l(self, a):
         """
         a未満のデータの最大のインデックスを取得します．
         aがデータ内の最大値より大きければN，小さければ-1を返却します．
@@ -51,7 +51,7 @@ class bisectMapper:
             return tmpr - 1
         return tmpl
 
-    def data_gq(self, a):
+    def data_g(self, a):
         """
         a超過のデータの最小のインデックスを取得します
         aがデータ内の最大値より大きければN，小さければ0を返却します．
