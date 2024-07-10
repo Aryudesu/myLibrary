@@ -69,7 +69,7 @@ class bisectMapper:
     def between_c_c(self, a, b):
         """a以上b以下のデータの個数を取得します"""
         # a以下となる最大のインデックス
-        tmp = self.data_leq(a)
+        tmp = self.data_geq(a)
         # はみ出た結果の場合
         if tmp == -1:
             tmp = 0
@@ -79,7 +79,7 @@ class bisectMapper:
             tmp += 1
         tmpl = tmp
         # b以上となる最小のインデックス
-        tmp = self.data_geq(b)
+        tmp = self.data_leq(b)
         if tmp == -1:
             tmp = 0
         if tmp == self.N:
@@ -92,7 +92,7 @@ class bisectMapper:
     def between_c_o(self, a, b):
         """a以上b未満のデータの個数を取得します"""
         # a以下となる最大のインデックス
-        tmp = self.data_leq(a)
+        tmp = self.data_geq(a)
         # はみ出た結果の場合
         if tmp == -1:
             tmp = 0
@@ -102,7 +102,7 @@ class bisectMapper:
             tmp += 1
         tmpl = tmp
         # b超過となる最小のインデックス
-        tmp = self.data_geq(b)
+        tmp = self.data_l(b)
         if tmp == -1:
             tmp = 0
         if tmp == self.N:
@@ -113,7 +113,7 @@ class bisectMapper:
     def between_o_c(self, a, b):
         """a超過b以下のデータの個数を取得します"""
         # a超過となる最大のインデックス
-        tmp = self.data_leq(a)
+        tmp = self.data_g(a)
         # はみ出た結果の場合
         if tmp == -1:
             tmp = 0
@@ -134,7 +134,7 @@ class bisectMapper:
     def between_o_o(self, a, b):
         """a超過b未満のデータの個数を取得します"""
         # a以下となる最大のインデックス
-        tmp = self.data_leq(a)
+        tmp = self.data_g(a)
         # はみ出た結果の場合
         if tmp == -1:
             tmp = 0
@@ -142,7 +142,7 @@ class bisectMapper:
             tmp = self.N - 1
         tmpl = tmp
         # b超過となる最小のインデックス
-        tmp = self.data_geq(b)
+        tmp = self.data_l(b)
         if tmp == -1:
             tmp = 0
         if tmp == self.N:
@@ -150,8 +150,8 @@ class bisectMapper:
         tmpr = tmp
         return tmpr - tmpl + 1
 
-# # *** Example (ABC248 D) ***
 
+# # *** Example (ABC248 D) ***
 N = int(input())
 A = [int(l) for l in input().split()]
 Q = int(input())
