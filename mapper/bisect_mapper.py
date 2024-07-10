@@ -89,6 +89,7 @@ class bisectMapper:
         tmpr = tmp
         return tmpr - tmpl + 1
 
+# # *** Example (ABC248 D) ***
 
 N = int(input())
 A = [int(l) for l in input().split()]
