@@ -7,7 +7,6 @@ class CuttableList:
     def __init__(self, Data = []):
         self.array_data = dict()
 
-
     def join(self, x, y):
         """xの後にyを結合します"""
         x_data = self.array_data.get(x, dict())
@@ -35,7 +34,6 @@ class CuttableList:
         while True:
             prev = data.get("prev")
             if prev is None:
-                start = now_a
                 break
             now_a = prev
             data = self.array_data.get(now_a, dict())
