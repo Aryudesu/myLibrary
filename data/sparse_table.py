@@ -13,11 +13,14 @@ class SparseTable:
 
         for j in range(1, self.k):
             for i in range(self.n - (1 << j) + 1):
-                self.table[j][i] = min(self.table[j - 1][i], self.table[j - 1][i + (1 << (j - 1))])
+                self.table[j][i] = min(
+                    self.table[j - 1][i], self.table[j - 1][i + (1 << (j - 1))]
+                )
 
     def query(self, left, right):
         j = self.log[right - left]
         return min(self.table[j][left], self.table[j][right - (1 << j)])
+
 
 arr = [1, 3, 2, 7, 9, 11, 3, 5]
 st = SparseTable(arr)

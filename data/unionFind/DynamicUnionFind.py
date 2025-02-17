@@ -1,10 +1,10 @@
 class DynamicUnionFind:
     def __init__(self, n):
         self.parent = list(range(n))  # 各ノードの親
-        self.rank = [0] * n           # 各ノードのランク
-        self.size = [1] * n          # 各連結成分のサイズ
-        self.history = []            # 操作の履歴（rollback用）
-        self.edges = set()           # 現在の辺集合
+        self.rank = [0] * n  # 各ノードのランク
+        self.size = [1] * n  # 各連結成分のサイズ
+        self.history = []  # 操作の履歴（rollback用）
+        self.edges = set()  # 現在の辺集合
 
     def leader(self, x):
         if self.parent[x] != x:
@@ -61,7 +61,7 @@ class DynamicUnionFind:
         # Rollback until the edge is effectively removed
         while self.history:
             yr, old_parent, xr, old_size = self.history[-1]
-            if (self.leader(x) != self.leader(y)):
+            if self.leader(x) != self.leader(y):
                 break
             self.rollback()
 
