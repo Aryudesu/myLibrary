@@ -2,9 +2,17 @@
 
 関数について
 
-## exp_gcd
+## tree
 
-拡張ユークリッドの互除法
+オイラーツアーからできるアレコレをメインに作成
+
+## fukumenzan
+
+覆面算を解いてくれるプログラム
+
+## z_algo
+
+z-algorithmについて．ちゃんと動くかは不明
 
 ## next_permutation
 
