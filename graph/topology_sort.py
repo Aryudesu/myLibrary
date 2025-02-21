@@ -36,6 +36,8 @@ class Graph:
         return topo_order
 
 
+# === ABC291E
+
 N, M = [int(l) for l in input().split()]
 graph = Graph(N)
 for _ in range(M):
