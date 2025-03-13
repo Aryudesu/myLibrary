@@ -29,3 +29,18 @@ class Mex:
         while self.num_count.get(self.mex_heap[0], 0) > 0:
             heapq.heappop(self.mex_heap)
         return self.mex_heap[0]
+
+
+# ABC194E
+
+N, M = [int(l) for l in input().split()]
+A = [int(l) for l in input().split()]
+mex = Mex(15 * (10**5) + 5)
+for i in range(M):
+    mex.add(A[i])
+result = mex.get_mex()
+for i in range(1, N - M + 1):
+    mex.discard(A[i - 1])
+    mex.add(A[i + M - 1])
+    result = min(result, mex.get_mex())
+print(result)
