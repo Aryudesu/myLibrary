@@ -1,17 +1,21 @@
+from collections import defaultdict
+
+
 class EulerTourTree:
     def __init__(self, n):
         self.n = n
-        self.graph = [[] for _ in range(n)]
-        self.euler = []  # オイラーツアーの順序
-        self.first = [-1] * n  # 各ノードが最初に出現する位置
-        self.depth = []  # 各ノードの深さ
-        self.seg_tree = []  # LCA用のRMQ
-        self.subtree_size = [0] * n  # 部分木のサイズ
-        self.time_in = [0] * n  # 訪問時刻
-        self.time_out = [0] * n  # 出発時刻
-        self.timer = 0  # タイムスタンプ
+        self.graph = defaultdict(list)
+        self.euler = []
+        self.first = dict()
+        self.depth = []
+        self.seg_tree = []
+        self.subtree_size = dict()
+        self.time_in = dict()
+        self.time_out = dict()
+        self.timer = 0
 
     def add_edge(self, u, v):
+        """グラフに辺を追加（defaultdictを活用）"""
         self.graph[u].append(v)
         self.graph[v].append(u)
 
@@ -22,15 +26,15 @@ class EulerTourTree:
         self.timer += 1
         self.euler.append(v)
         self.depth.append(d)
-        self.subtree_size[v] = 1  # 初期値: 自分自身のみ
+        self.subtree_size[v] = 1
 
         for to in self.graph[v]:
             if to == p:
                 continue
             self.dfs(to, v, d + 1)
-            self.euler.append(v)  # 戻りのノードを記録
+            self.euler.append(v)
             self.depth.append(d)
-            self.subtree_size[v] += self.subtree_size[to]  # 部分木のサイズを加算
+            self.subtree_size[v] += self.subtree_size[to]
 
         self.time_out[v] = self.timer
         self.timer += 1
@@ -45,7 +49,7 @@ class EulerTourTree:
         m = len(self.euler)
         log_m = (m - 1).bit_length()
         self.seg_tree = [[0] * m for _ in range(log_m)]
-        self.seg_tree[0] = list(range(m))  # 初期値: インデックス
+        self.seg_tree[0] = list(range(m))
 
         for i in range(1, log_m):
             for j in range(m - (1 << i) + 1):
@@ -71,7 +75,7 @@ class EulerTourTree:
 
     def get_subtree_size(self, v):
         """部分木のサイズを取得"""
-        return self.subtree_size[v]
+        return self.subtree_size.get(v, 0)
 
     def is_ancestor(self, u, v):
         """u が v の祖先か判定"""
