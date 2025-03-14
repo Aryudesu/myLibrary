@@ -51,22 +51,22 @@ class BellmanFord:
 
     def get_distance(self, goal):
         if self.result is None:
-            return -inf
+            return None
         return self.result[goal]
 
 
 graph = Graph()
 # 負サイクルなし
-graph.add_edge(0, 1, 4)
-graph.add_edge(0, 2, 3)
-graph.add_edge(1, 2, -2)
-graph.add_edge(1, 3, 1)
-graph.add_edge(2, 3, 2)
+# graph.add_edge(0, 1, 4)
+# graph.add_edge(0, 2, 3)
+# graph.add_edge(1, 2, -2)
+# graph.add_edge(1, 3, 1)
+# graph.add_edge(2, 3, 2)
 # 負サイクルあり
-# graph.add_edge(0, 1, -1)
-# graph.add_edge(1, 2, -1)
-# graph.add_edge(2, 0, -1)
-# graph.add_edge(2, 3, 1)
+graph.add_edge(0, 1, -1)
+graph.add_edge(1, 2, -1)
+graph.add_edge(2, 0, -1)
+graph.add_edge(2, 3, 1)
 bf = BellmanFord(graph, 0)
 print(bf.is_contain_ng_dist())
 print(bf.get_result())
