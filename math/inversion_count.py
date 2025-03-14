@@ -11,7 +11,7 @@ class BIT:
             idx += idx & -idx
 
     def sum(self, idx):
-        """idxまでの累積わを求める"""
+        """idxまでの累積和を求める"""
         res = 0
         while idx > 0:
             res += self.tree[idx]

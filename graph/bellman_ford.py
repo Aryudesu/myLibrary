@@ -1,11 +1,62 @@
-def bellman_ford(n, edges, start):
-    dist = [float('inf')] * n
-    dist[start] = 0
-    for _ in range(n - 1):
-        for u, v, w in edges:
-            if dist[u] + w < dist[v]:
-                dist[v] = dist[u] + w
-    for u, v, w in edges:
-        if dist[u] + w < dist[v]:
-            return None
-    return dist
+from collections import defaultdict
+
+inf = 10**18
+
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(lambda: [])
+        self.node = set()
+
+    def __len__(self):
+        return len(self.node)
+
+    def add_edge(self, src, dst, weight):
+        self.graph[src].append((dst, weight))
+        self.node.add(src)
+        self.node.add(dst)
+
+    def get_nodes(self):
+        return self.node
+
+    def get_edge(self, node):
+        return self.graph[node]
+
+
+class BellmanFord:
+    def __init__(self, graph: Graph, start):
+        res = defaultdict(lambda: inf)
+        res[start] = 0
+        nodes = graph.get_nodes()
+        for _ in range(len(graph) - 1):
+            for v in nodes:
+                for d, w in graph.get_edge(v):
+                    if res[v] != inf and res[v] + w < res[d]:
+                        res[d] = res[v] + w
+        for v in nodes:
+            for d, w in graph.get_edge(v):
+                if res[v] + w < res[d]:
+                    res = None
+        self.result = res
+
+    def is_contain_ng_dist(self):
+        return self.result is None
+
+    def get_result(self):
+        return self.result
+
+    def get_distance(self, goal):
+        if self.result is None:
+            return -inf
+        return self.result[goal]
+
+
+graph = Graph()
+graph.add_edge(0, 1, 4)
+graph.add_edge(0, 2, 3)
+graph.add_edge(1, 2, -2)
+graph.add_edge(1, 3, 1)
+graph.add_edge(2, 3, 2)
+bf = BellmanFord(graph, 0)
+print(bf.is_contain_ng_dist())
+print(bf.get_result())
