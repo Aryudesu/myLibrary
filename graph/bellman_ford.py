@@ -33,11 +33,15 @@ class BellmanFord:
                 for d, w in graph.get_edge(v):
                     if res[v] != inf and res[v] + w < res[d]:
                         res[d] = res[v] + w
+        cycle = False
         for v in nodes:
             for d, w in graph.get_edge(v):
                 if res[v] + w < res[d]:
-                    res = None
-        self.result = res
+                    cycle = True
+                    break
+            if cycle:
+                break
+        self.result = None if cycle else res
 
     def is_contain_ng_dist(self):
         return self.result is None
@@ -52,11 +56,17 @@ class BellmanFord:
 
 
 graph = Graph()
+# 負サイクルなし
 graph.add_edge(0, 1, 4)
 graph.add_edge(0, 2, 3)
 graph.add_edge(1, 2, -2)
 graph.add_edge(1, 3, 1)
 graph.add_edge(2, 3, 2)
+# 負サイクルあり
+# graph.add_edge(0, 1, -1)
+# graph.add_edge(1, 2, -1)
+# graph.add_edge(2, 0, -1)
+# graph.add_edge(2, 3, 1)
 bf = BellmanFord(graph, 0)
 print(bf.is_contain_ng_dist())
 print(bf.get_result())
