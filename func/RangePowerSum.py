@@ -73,6 +73,7 @@ class RangePowerSum:
         return result
 
 
+# === ABC399 F問題
 N, K = [int(l) for l in input().split()]
 A = [int(l) for l in input().split()]
 rps = RangePowerSum(A, K)
