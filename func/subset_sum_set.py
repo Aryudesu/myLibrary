@@ -1,5 +1,5 @@
 def subset_sum_set(A: list, target: int):
-    """setを用いた部分和問題"""
+    """setを用いた部分和問題（全て正）"""
     if target == 0:
         return True
     A = [a for a in A if a <= target]
