@@ -1,7 +1,7 @@
 from itertools import product
 
 
-def bit_brute_force(A):
+def bit_brute_force(A: list):
     """Bit全探索を行います"""
     for bits in product([0, 1], repeat=len(A)):
         data = [x for bit, x in zip(bits, A) if bit]
