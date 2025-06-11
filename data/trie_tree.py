@@ -1,10 +1,16 @@
 class TrieNode:
+    """Trie木のノード"""
+
     def __init__(self):
         self.children = {}
+        # 文字列終了のノードか
         self.is_end_of_word = False
-        self.count = 0
+        # TODO やりたいことによってもたせるデータを用意する
+
 
 class Trie:
+    """Trie木"""
+
     def __init__(self):
         self.root = TrieNode()
         self.total = 0
@@ -16,8 +22,6 @@ class Trie:
             if char not in node.children:
                 node.children[char] = TrieNode()
             node = node.children[char]
-            self.total += node.count
-            node.count += 1
         node.is_end_of_word = True
 
     def search(self, word):
@@ -38,9 +42,17 @@ class Trie:
             node = node.children[char]
         return True
 
+    def dfs(self, node: TrieNode | None):
+        """深さ優先探索（木DP）"""
+        if node is None:
+            node = self.root
+        for c in node.children:
+            self.dfs(node.children[c])
+
+
 N = int(input())
 S = input().split()
 trie = Trie()
 for s in S:
     trie.insert(s)
-print(trie.total)
+trie.dfs(None)

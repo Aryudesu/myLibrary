@@ -12,5 +12,6 @@ class Combination:
     def comb(self, n, k):
         if n < k or k < 0:
             return 0
-        return self.fact[n] * self.inv_fact[k] % self.mod * self.inv_fact[n - k] % self.mod
-
+        return (
+            self.fact[n] * self.inv_fact[k] % self.mod * self.inv_fact[n - k] % self.mod
+        )
