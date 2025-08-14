@@ -49,13 +49,9 @@ H, W, K = [int(l) for l in input().split()]
 LEFT, RIGHT, UP, DOWN = (0, -10), (0, -5), (-10, 0), (-5, 0)
 wall = [LEFT, RIGHT, UP, DOWN]
 rc = [tuple([int(l) - 1 for l in input().split()]) for _ in range(K)]
-for w in wall:
-    rc.append(w)
 
-uf = ObjectUnionFind(rc)
+uf = ObjectUnionFind(rc + wall)
 for r, c in rc:
-    if r < 0 or c < 0:
-        continue
     now_rc = (r, c)
     for i in range(-1, 2):
         for j in range(-1, 2):
@@ -73,14 +69,5 @@ for r, c in rc:
             if next_rc in uf:
                 uf.merge(now_rc, next_rc)
 
-result = True
-for i in range(4):
-    for j in range(i + 1, 4):
-        w1, w2 = wall[i], wall[j]
-        if w1 == RIGHT and w2 == UP:
-            continue
-        if w1 == LEFT and w2 == DOWN:
-            continue
-        if uf.same(w1, w2):
-            result = False
+result = not (uf.same(LEFT, RIGHT) or uf.same(LEFT, UP) or uf.same(RIGHT, DOWN) or uf.same(UP, DOWN))
 print("Yes" if result else "No")
