@@ -71,6 +71,6 @@ def zeros_in_range(tmin, tmax, dps=120, alpha=0.3, tol_exp=-100):
             cleaned.append(z)
     return cleaned
 
-zeros = zeros_in_range(0, 100)
+zeros = zeros_in_range(0, 1000)
 for z in zeros:
     print(z)
