@@ -24,16 +24,17 @@ class Partition:
                     result %= self.mod
         return result
 
-    def getParition(self, num: int) -> int:
+    def getPartition(self, num: int) -> int:
         """numに対しての分割数を取得します"""
         assert self.num > num
         return self.data[num]
 
-    def getParitionList(self) -> list:
+    def getPartitionList(self) -> list:
         """分割数をリストで返却します"""
         return self.data
 
 pt = Partition(4*(10**4), 998244353)
 Q = int(input())
 for q in range(Q):
-    print(q, pt.getParition(int(input())))
+    print(pt.getParition(int(input())))
+
