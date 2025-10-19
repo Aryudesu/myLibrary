@@ -43,6 +43,7 @@ class Partition:
         """分割数をリストで返却します"""
         return self.data
 
+# === sample
 pt = Partition(4*(10**4), 998244353)
 Q = int(input())
 for q in range(Q):
