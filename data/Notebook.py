@@ -1,7 +1,8 @@
 class Node:
-    def __init__(self, val: int | None = None, prev: "Node | None" = None):
+    def __init__(self, val: int | None = None, prev: "Node | None" = None, num: int = 0):
         self.value = val
         self.prev = prev
+        self.num = num
 
 class Notebook:
     """保存・ロード機能のある永続スタック"""
@@ -11,7 +12,7 @@ class Notebook:
         self.root = self.now
 
     def add(self, val: int):
-        self.now = Node(val, self.now)
+        self.now = Node(val, self.now, self.now.num + 1)
     
     def delete(self):
         if (not self.now is self.root) and (not self.now.prev is None):
@@ -37,6 +38,9 @@ class Notebook:
             tmp = tmp.prev
         result.reverse()
         return result
+
+    def __len__(self):
+        return self.now.num
 
 # === ABC273E
 nb = Notebook()
