@@ -1,4 +1,5 @@
 class CoordinateCompress:
+    """座標圧縮用クラス"""
     def __init__(self):
         self.vals = []
         self.id = None
