@@ -1,4 +1,4 @@
-def next_permutation(data):
+def nextPermutation(data):
     """next_permutation"""
     size = len(data)
     left = size - 2
@@ -22,5 +22,5 @@ def next_permutation(data):
 size = 4
 data = [10 + i for i in range(size)]
 for i in range(size):
-    next_permutation(data)
+    nextPermutation(data)
     print(data)
