@@ -1,8 +1,8 @@
 from atcoder.fenwicktree import FenwickTree
 import sys
-# import pypyjit
+import pypyjit
 sys.setrecursionlimit(10**6)
-# pypyjit.set_param('max_unroll_recursion=-1')
+pypyjit.set_param('max_unroll_recursion=-1')
 
 class SubTreeSumCalculator:
     """木に対し、頂点重みの部分木和を管理する"""
