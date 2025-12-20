@@ -18,8 +18,8 @@ class AppendTrieTree:
     
     def append(self, prev, val, label):
         """
-        prevに対しvalをキーとしたlabelのついたノードを追加します
-        valをキーとしたノードが存在する場合は，対象のノードにキーを追加します．
+        prevというIDのノードに対しvalをキーとしたlabelをIDとするノードを追加します
+        valをキーとしたノードが既に存在する場合は，対象のノードにlabelを追加します．
         """
         assert prev in self.nodes
         prevNode = self.nodes[prev]
