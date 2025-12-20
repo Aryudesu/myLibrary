@@ -2,10 +2,11 @@ import sys
 sys.setrecursionlimit(10**6)
 
 class TrieNode:
-    """Trie木のノード"""
+    """Trie木のノード．"""
     __slots__ = ("children", "labels")
     def __init__(self):
         self.children = {}
+        # ノードに対応するID一覧
         self.labels = []
         # TODO やりたいことによってもたせるデータを用意する
 
@@ -30,7 +31,6 @@ class AppendTrieTree:
         self.nodes[label] = nextNode
 
 # === Sample: ABC437E
-# 辞書順にデータを取得します
 def dfs(root: TrieNode):
     result = []
     stack = [root]
