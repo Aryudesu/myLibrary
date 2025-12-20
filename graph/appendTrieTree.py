@@ -30,24 +30,23 @@ class AppendTrieTree:
         nextNode.labels.append(label)
         self.nodes[label] = nextNode
 
-# === Sample: ABC437E
-def dfs(root: TrieNode):
-    result = []
-    stack = [root]
-    while stack:
-        node = stack.pop()
-        node.labels.sort()
-        result.extend(node.labels)
-        keys = sorted(node.children.keys(), reverse=True)
-        for k in keys:
-            stack.append(node.children[k])
-    return result
+    def order_lex(self):
+        """辞書順のラベルを取得します"""
+        result = []
+        stack = [self.root]
+        while stack:
+            node = stack.pop()
+            node.labels.sort()
+            result.extend(node.labels)
+            keys = sorted(node.children.keys(), reverse=True)
+            for k in keys:
+                stack.append(node.children[k])
+        return result
 
 at = AppendTrieTree(0)
 N = int(input())
 for n in range(1, N + 1):
     x, y = map(int, input().split())
     at.append(x, y, n)
-g = at.root
-result = dfs(g)
+result = at.order_lex()
 print(*result)
