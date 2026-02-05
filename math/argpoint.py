@@ -55,8 +55,8 @@ def compress_direction(points: list[ArgPoint]):
     indexData = [0] * N
     count = 0
     for p in points:
-        key = (p.x, p.y)
-        if not key in p2Id:
+        key = p.getNormalizePoint()
+        if key not in p2Id:
             p2Id[key] = count
             countPerDir.append(0)
             count += 1
@@ -89,13 +89,8 @@ for _ in range(Q):
     a, b = map(int, input().split())
     aidx = indexData[a-1]
     bidx = indexData[b-1]
-    if aidx == bidx:
-        result.append(pData[bidx+1] - pData[aidx])
-    else:
-        if aidx > bidx:
-            bidx += l
-        if aidx > bidx:
-            raise Exception()
-        result.append(pData[bidx+1] - pData[aidx])
+    if aidx > bidx:
+        bidx += l
+    result.append(pData[bidx+1] - pData[aidx])
 for r in result:
     print(r)
