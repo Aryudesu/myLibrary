@@ -46,8 +46,8 @@ class RollingHash:
         if len(self) < len(pattern) or len(pattern) == 0:
             return -1
         target = pattern.hashAll()
-        for idx in range(len(A)):
-            if self.get(idx, idx + len(A)) == target:
+        for idx in range(len(self) - len(pattern) + 1):
+            if self.get(idx, idx + len(pattern)) == target:
                 return idx
         return -1
     
@@ -57,8 +57,8 @@ class RollingHash:
             return []
         result = []
         target = pattern.hashAll()
-        for idx in range(len(A)):
-            if self.get(idx, idx + len(A)) == target:
+        for idx in range(len(self) - len(pattern) + 1):
+            if self.get(idx, idx + len(pattern)) == target:
                 result.append(idx)
         return result
     
