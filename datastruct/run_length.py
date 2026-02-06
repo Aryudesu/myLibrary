@@ -6,12 +6,27 @@ class RunLength:
     ランレングス符号クラス
     Edited by Aryu
     """
-    def __init__(self) -> None:
+    def __init__(self, data: list[Any]|str|None = None) -> None:
         self.data: deque[Tuple[Any, int]] = deque()
         self.size = 0
+        if data is None:
+            return
+        if len(data) == 0:
+            return
+        prev = data[0]
+        cnt = 0
+        for dat in data:
+            if dat == prev:
+                cnt += 1
+            else:
+                self.data.append((prev, cnt))
+                cnt = 1
+            prev = dat
+        self.data.append((prev, cnt))
+        self.size = len(data)
 
     def appendRight(self, x: Any, n: int)->None:
-        """xをa個追加"""
+        """右からxをa個追加"""
         if self.data and self.data[-1][0] == x:
             v, c = self.data[-1]
             self.data[-1] = (v, c + n)
@@ -20,6 +35,7 @@ class RunLength:
         self.size += n
     
     def appendLeft(self, x: Any, n: int)->None:
+        """左からxをa個追加"""
         if self.data and self.data[0][0] == x:
             v, c = self.data[0]
             self.data[0] = (v, c + n)
@@ -28,7 +44,7 @@ class RunLength:
         self.size += n
 
     def popRight(self, n: int)->list[Tuple[Any, int]]:
-        """末尾からn個取得．個数が不足している場合は全て取得．"""
+        """右側からn個取得．個数が不足している場合は全て取得．"""
         if n == 0 or self.size == 0:
             return []
         num = min(n, self.size)
@@ -45,7 +61,7 @@ class RunLength:
         return result
 
     def popLeft(self, n: int)->list[Tuple[Any, int]]:
-        """先頭からデータをn個取得"""
+        """左側からデータをn個取得"""
         if n == 0 or self.size == 0:
             return []
         num = min(n, self.size)
@@ -66,9 +82,22 @@ class RunLength:
 
     def __len__(self):
         return self.size
+    
+    def __iter__(self):
+        return iter(self.data)
+
+    def __repr__(self):
+        return f"RunLength({self.data}, size={self.size})"
 
 
 # *** Example (ABC413 C) ***
+def popFrontSum(data: RunLength, num: int)->int:
+    res = 0
+    for v, c in data.popLeft(num):
+        res += v * c
+    return res
+
+
 rl = RunLength()
 result = []
 Q = int(input())
@@ -80,12 +109,8 @@ for _ in range(Q):
         rl.appendRight(x, c)
     elif t == 2:
         k = p[0]
-        dat = rl.popLeft(k)
-        for d in dat:
-            res += d[0] * d[1]
-        result.append(res)
+        result.append(popFrontSum(rl, k))
     else:
         raise Exception()
-
 for r in result:
     print(r)
