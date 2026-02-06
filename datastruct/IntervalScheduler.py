@@ -1,4 +1,5 @@
 class IntervalScheduler:
+    """区間スケジューリング問題（区間数最大問題）"""
     def __init__(self):
         self.schedule = []
 
