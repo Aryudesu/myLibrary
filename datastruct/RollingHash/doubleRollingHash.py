@@ -59,8 +59,8 @@ class RollingHash:
         target = pattern.hashAll()
         for idx in range(len(A)):
             if self.get(idx, idx + len(A)) == target:
-                return idx
-        return -1
+                result.append(idx)
+        return result
     
     def lcp(self, other: "RollingHash")->int:
         """最長共通接頭辞の長さを返却します．"""
