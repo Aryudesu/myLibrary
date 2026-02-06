@@ -1,5 +1,5 @@
-class RollingHash:
-    """ローリングハッシュライブラリ"""
+class SingleRollingHash:
+    """単体ローリングハッシュライブラリ"""
     def __init__(self, S: str|list[int], base=37, MOD=10**9 + 9):
         self.base = base
         self.MOD = MOD
