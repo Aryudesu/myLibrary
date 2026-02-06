@@ -1,7 +1,10 @@
 from typing import Tuple
 
 class RollingHash:
-    """ダブルローリングハッシュライブラリ"""
+    """
+    ダブルローリングハッシュライブラリ
+    Edited by Aryu
+    """
     def __init__(self, S: str|list[int], base1=37, MOD1=10**9 + 9, base2=157, MOD2 = 10**9 + 7):
         self.base1 = base1
         self.MOD1 = MOD1
