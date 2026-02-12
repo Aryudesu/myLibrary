@@ -32,10 +32,20 @@ class Kruskal:
         """最小全域木のコストの総和"""
         return sum([data.cost for data in Kruskal.kruskal(n, edges)])
 
-# 競技プログラミングの鉄則A67
 N, M = map(int, input().split())
 edges = []
 for _ in range(M):
-    a, b, c = map(int, input().split())
-    edges.append((c, a-1, b-1))
-print(Kruskal.kruskal_mst(N, edges))
+    K, C = map(int, input().split())
+    A = list(map(int, input().split()))
+    A = [x - 1 for x in A]
+    for j in range(1, K):
+        edges.append((C, A[0], A[j]))
+ans = 0
+used_edges = 0
+for data in Kruskal.kruskal(N, edges):
+    ans += data.cost
+    used_edges += 1
+if used_edges != N - 1:
+    print(-1)
+else:
+    print(ans)
