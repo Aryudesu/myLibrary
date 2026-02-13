@@ -2,7 +2,7 @@ class SparseTable:
     """普遍な数列の任意の区間の最小値を取得する"""
     def __init__(self, array):
         self.n = len(array)
-        self.k = (self.n - 1).bit_length()
+        self.k = self.n.bit_length()
         self.table = [[0] * self.n for _ in range(self.k)]
         self.log = [0] * (self.n + 1)
 
