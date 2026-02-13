@@ -5,13 +5,10 @@ class SparseTable:
         self.k = self.n.bit_length()
         self.table = [[0] * self.n for _ in range(self.k)]
         self.log = [0] * (self.n + 1)
-
         for i in range(self.n):
             self.table[0][i] = array[i]
-
         for i in range(2, self.n + 1):
             self.log[i] = self.log[i // 2] + 1
-
         for j in range(1, self.k):
             for i in range(self.n - (1 << j) + 1):
                 self.table[j][i] = min(
@@ -19,6 +16,7 @@ class SparseTable:
                 )
 
     def query(self, left, right):
+        """[left, right)のうちの最大値を取得する"""
         j = self.log[right - left]
         return min(self.table[j][left], self.table[j][right - (1 << j)])
 
