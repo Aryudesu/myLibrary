@@ -33,6 +33,27 @@ class primeCalc:
                 return result
             idx += 1
         return result
+    
+    def soinsu2(self, n: int):
+        """Nの素因数分解．"""
+        tmp = n
+        idx = 0
+        result = []
+        while tmp > 1:
+            p = self.primes[idx]
+            if tmp % p == 0:
+                count = 0
+                while True:
+                    if tmp % p != 0:
+                        result.append((p, count))
+                        break
+                    count += 1
+                    tmp //= p
+            elif p * p > tmp:
+                result.append((tmp, 1))
+                return result
+            idx += 1
+        return result
 
     def yakusu(self, n: int):
         """Nの約数の個数計算"""
@@ -58,4 +79,4 @@ class primeCalc:
 
 
 pc = primeCalc(10**7)
-print(*pc.soinsu(int(input())))
+print(*pc.soinsu2(int(input())))
