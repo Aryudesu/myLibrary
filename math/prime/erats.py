@@ -1,17 +1,17 @@
-def eratosthenes(N):
+def eratosthenes(N: int)->list[int]:
     """エラトステネスの篩"""
-    result = [True] * (N + 1)
-    primes = [2]
+    is_prime = [True] * (N + 1)
+    is_prime[0] = is_prime[1] = False
+    primes = [2] if N >= 2 else []
     for i in range(3, N + 1, 2):
-        if not result[i]:
+        if not is_prime[i]:
             continue
         primes.append(i)
-        idx = 3
-        while idx * i <= N:
-            result[idx * i] = False
-            idx += 2
+        if i * i > N:
+            continue
+        for j in range(i * i, N + 1, 2 * i):
+            is_prime[j] = False
     return primes
-
 
 N = 1000
 result = eratosthenes(N)
