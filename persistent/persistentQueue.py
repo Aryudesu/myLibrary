@@ -61,7 +61,6 @@ class PersistentDequeue:
         while pointer is not self.root:
             result.append(pointer.value)
             pointer = pointer.prev
-        result.reverse()
         rev_result = []
         pointer = self.front
         while pointer is not self.root:
@@ -75,8 +74,8 @@ class PersistentDequeue:
 
 
 N = 100
-pq = PersistentQueue()
+pq = PersistentDequeue()
 for i in range(N):
-    pq.enqueue(i)
-    pq.enqueue_front(-i)
+    pq.append(i)
+    pq.appendleft(-i)
 print(pq.getArray())
