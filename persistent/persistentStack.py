@@ -1,4 +1,5 @@
 class Node:
+    __slots__ = ("value", "prev", "num")
     def __init__(self, val: int | None = None, prev: "Node | None" = None, num: int = 0):
         self.value = val
         self.prev = prev
@@ -12,25 +13,33 @@ class PersistentStack:
         self.root = self.now
 
     def push(self, val: int):
+        """新規にデータを追加します"""
         self.now = Node(val, self.now, self.now.num + 1)
     
     def pop(self):
-        if (not self.now is self.root) and (not self.now.prev is None):
+        """末尾のスタックを削除します"""
+        if self.now is not self.root and self.now.prev is not None:
             self.now = self.now.prev
 
     def bookmark(self, num: int):
+        """bookmarkを登録します"""
         self.pages[num] = self.now
 
     def rollback(self, num: int):
+        """bookmarkに戻ります"""
+        assert num in self.pages
         self.now = self.pages.get(num, self.root)
 
-    def getLast(self)-> int:
+    def top(self)-> int:
+        """最後に入力したデータを取得します"""
         return self.now.value
 
     def isRoot(self)-> bool:
+        """現在のデータが空データかを判定します"""
         return self.now is self.root
 
     def getArray(self)-> list[int]:
+        """現在の配列を取得します"""
         result = []
         tmp = self.now
         while not tmp.prev is None:
@@ -56,5 +65,5 @@ for _ in range(Q):
         nb.bookmark(int(query[1]))
     elif query[0] == "LOAD":
         nb.rollback(int(query[1]))
-    result.append(-1 if nb.isRoot() else nb.getLast())
+    result.append(-1 if nb.isRoot() else nb.top())
 print(*result)
