@@ -1,89 +1,71 @@
-class DynamicUnionFind:
-    def __init__(self, n):
-        self.parent = list(range(n))  # 各ノードの親
-        self.rank = [0] * n  # 各ノードのランク
-        self.size = [1] * n  # 各連結成分のサイズ
-        self.history = []  # 操作の履歴（rollback用）
-        self.edges = set()  # 現在の辺集合
+class RollbackUnionFind:
+    """
+    ロールバック可能な Union-Find
 
-    def leader(self, x):
-        if self.parent[x] != x:
-            self.parent[x] = self.leader(self.parent[x])  # 経路圧縮
-        return self.parent[x]
+    特徴:
+    - 経路圧縮なし（ロールバックと相性のため）
+    - union-by-size
+    - snapshot() / rollback(snap) で任意の時点に戻せる
+    """
+    __slots__ = ("parent", "size", "history", "components")
 
-    def merge(self, x, y):
-        xr = self.leader(x)
-        yr = self.leader(y)
+    def __init__(self, n: int):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        # (child, old_parent, old_size_of_root)
+        self.history: list[tuple[int, int, int]] = [] 
+        self.components = n
 
-        if xr == yr:
-            return False
+    def leader(self, x: int) -> int:
+        """親をたどるだけの leader（経路圧縮なし）"""
+        while self.parent[x] != x:
+            x = self.parent[x]
+        return x
 
-        # ランクを考慮してマージ
-        if self.rank[xr] < self.rank[yr]:
-            xr, yr = yr, xr
-
-        self.history.append((yr, self.parent[yr], xr, self.size[xr]))
-
-        self.parent[yr] = xr
-        self.size[xr] += self.size[yr]
-
-        if self.rank[xr] == self.rank[yr]:
-            self.rank[xr] += 1
-
-        self.edges.add((min(x, y), max(x, y)))
-        return True
-
-    def connected(self, x, y):
+    def same(self, x: int, y: int) -> bool:
         return self.leader(x) == self.leader(y)
 
-    def rollback(self):
-        if not self.history:
-            return False
-
-        yr, old_parent, xr, old_size = self.history.pop()
-
-        self.parent[yr] = old_parent
-        self.size[xr] = old_size
-
-        if self.rank[xr] > self.rank[yr]:
-            self.rank[xr] -= 1
-
-        return True
-
-    def cut(self, x, y):
-        # Ensure the edge exists
-        edge = (min(x, y), max(x, y))
-        if edge not in self.edges:
-            return False
-
-        self.edges.remove(edge)
-
-        # Rollback until the edge is effectively removed
-        while self.history:
-            yr, old_parent, xr, old_size = self.history[-1]
-            if self.leader(x) != self.leader(y):
-                break
-            self.rollback()
-
-        return True
-
-    def size_of(self, x):
-        # Return the size of the connected component containing x
+    def size_of(self, x: int) -> int:
         return self.size[self.leader(x)]
 
+    def merge(self, x: int, y: int) -> bool:
+        """
+        x と y の属する集合を union する。
+        すでに同じ集合なら False を返し、履歴にはダミーを積む。
+        """
+        x = self.leader(x)
+        y = self.leader(y)
+        if x == y:
+            # ダミー（rollback のループを簡単にするため）
+            self.history.append((-1, -1, -1))
+            return False
 
-N, M, E = [int(l) for l in input().split()]
-duf = DynamicUnionFind(N + M)
-for m in range(M - 1):
-    duf.merge(N + m, N + m + 1)
-UV = []
-for e in range(E):
-    u, v = [int(l) - 1 for l in input().split()]
-    duf.merge(u, v)
-    UV.append([u, v])
-Q = int(input())
-for q in range(Q):
-    x = int(input()) - 1
-    u, v = UV[x]
-    duf.cut(u, v)
-    print(duf.size_of(N) - M + 1)
+        # union-by-size: size の大きい方を親にする
+        if self.size[x] < self.size[y]:
+            x, y = y, x
+
+        # y を x にぶら下げる
+        self.history.append((y, self.parent[y], self.size[x]))
+        self.parent[y] = x
+        self.size[x] += self.size[y]
+        self.components -= 1
+        return True
+
+    def snapshot(self) -> int:
+        """現在の history の長さをスナップショットとして返す"""
+        return len(self.history)
+
+    def rollback(self, snapshot: int) -> None:
+        """
+        snapshot() の返り値まで巻き戻す。
+        それ以降の merge はすべて取り消される。
+        """
+        while len(self.history) > snapshot:
+            y, old_parent, old_size = self.history.pop()
+            if y == -1:
+                # ダミー履歴（union 失敗時）
+                continue
+            x = self.parent[y]
+            self.parent[y] = old_parent
+            self.size[x] = old_size
+            self.components += 1
