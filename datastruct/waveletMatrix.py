@@ -55,7 +55,6 @@ class WaveletMatrix:
             self.n = len(self.a)
             self.build()
 
-    # ---------- build ----------
     def build(self):
         if self.n == 0:
             self.lg = 0
@@ -69,7 +68,6 @@ class WaveletMatrix:
         cur = self.a[:]
         nxt = [0] * self.n
 
-        # h = 上位ビットから
         for h in range(self.lg - 1, -1, -1):
             bvh = self.bv[h]
             zeros = 0
@@ -83,7 +81,6 @@ class WaveletMatrix:
             bvh.build()
             bvh.zeros = zeros
 
-            # 配置し直し
             p0, p1 = 0, zeros
             for v in cur:
                 if (v >> h) & 1:
@@ -99,7 +96,6 @@ class WaveletMatrix:
         """サイズだけ指定したモードで、後から a を詰めたあとに呼ぶ。"""
         self.build()
 
-    # ---------- access ----------
     def access(self, k: int) -> int:
         """a[k]（0-index）の値を返す"""
         assert 0 <= k < self.n
@@ -119,7 +115,6 @@ class WaveletMatrix:
 
         return res
 
-    # ---------- kth ----------
     def kthSmallest(self, l: int, r: int, k: int) -> int:
         """[l, r) で k 番目の最小値 (0-index)"""
         assert 0 <= l <= r <= self.n
@@ -150,7 +145,6 @@ class WaveletMatrix:
     def kthLargest(self, l: int, r: int, k: int) -> int:
         return self.kthSmallest(l, r, (r - l - 1) - k)
 
-    # ---------- freq ----------
     def rangeFreq(self, l: int, r: int, upper: int) -> int:
         """[l, r) で x < upper の x の個数"""
         assert 0 <= l <= r <= self.n
@@ -186,7 +180,6 @@ class WaveletMatrix:
     def rangeFreqRange(self, l: int, r: int, lower: int, upper: int) -> int:
         return self.rangeFreq(l, r, upper) - self.rangeFreq(l, r, lower)
 
-    # ---------- prev / next ----------
     def prevValue(self, l: int, r: int, upper: int) -> int:
         """upper 未満の最大値"""
         cnt = self.rangeFreq(l, r, upper)
