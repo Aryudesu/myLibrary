@@ -1,83 +1,32 @@
-from typing import Tuple
-
 class FunctionalGraph:
-    """list[int]形式のグラフについてのUtility"""
-    def __init__(self, graph: list[int]):
-        self.graph = graph.copy()
-        self.N = len(graph)
+    """Functional Graph の始点からの遷移解析"""
 
-    def getCycle(self, node: int, memo: set[int], result: list[int])->int:
-        """nodeから開始し，サイクルを取得します"""
-        if node in memo:
-            result.append(node)
-            return node
-        nextNode = self.graph[node]
-        memo.add(node)
-        res = self.getCycle(nextNode, memo, result)
-        if res == node:
-            return -1
-        if res >= 0:
-            result.append(node)
-        return res
+    def __init__(self, to: list[int], start: int):
+        self.to = to
+        self.start = start
+        self.order = []
+        self.pos = {}
+        self.loop_start = -1
+        self.loop = []
+        self._build()
 
-    def getCycles(self)-> list[list[int]]:
-        """サイクルを取得します"""
-        memo = set()
-        result = []
-        for n in range(self.N):
-            if n in memo:
-                continue
-            res = []
-            self.getCycle(n, memo, res)
-            result.append(res)
-        return result
+    def _build(self) -> None:
+        now = self.start
+        while now not in self.pos:
+            self.pos[now] = len(self.order)
+            self.order.append(now)
+            now = self.to[now]
 
-def dfs(node, M, mTimesMemo)->bool:
-    s1, s2 = node//M, node%M
-    s3 = (A * s2 + B * s1) % M
-    nextNode = s2 * M + s3
-    if s1 == 0 or s2 == 0:
-        mTimesMemo[node] = True
-        return True
-    if mTimesMemo[node] is None:
-        res = dfs(nextNode, M, mTimesMemo)
-        mTimesMemo[node] = res
-    return mTimesMemo[node]
+        self.loop_start = self.pos[now]
+        self.loop = self.order[self.loop_start:]
 
-def xy2num(x: int, y: int, M: int)-> int:
-    return x * M + y
+    def kth(self, k: int) -> int:
+        """start から k 回遷移した先を返す"""
+        if k < len(self.order):
+            return self.order[k]
+        return self.loop[(k - self.loop_start) % len(self.loop)]
 
-def num2xy(num: int, M: int)-> Tuple[int, int]:
-    return (num//M, num%M)
+    def is_in_loop(self, v: int) -> bool:
+        """v が start から到達するループ部分に含まれるか"""
+        return v in self.pos and self.pos[v] >= self.loop_start
 
-M, A, B = map(int, input().split())
-mTimesMemo = [None] * (M * M)
-graph = [None] * (M * M)
-for i in range(M):
-    for j in range(M):
-        s1, s2 = i, j
-        s3 = (A * s2 + B * s1) % M
-        n1 = xy2num(s1, s2, M)
-        n2 = xy2num(s2, s3, M)
-        # 自己ループのときにn1がMの倍数であればTrue
-        if n1 == n2:
-            mTimesMemo[n1] = n1 % M == 0
-        graph[n1] = n2
-fg = FunctionalGraph(graph)
-cycle = fg.getCycles()
-
-for dat in cycle:
-    f = False
-    # 長さが1より大きければループ
-    if len(dat) > 1:
-        for d in dat:
-            s1, s2 = d//M, d%M
-            if s1 == 0 or s2 == 0:
-                f = True
-                break
-        for d in dat:
-            mTimesMemo[d] = f
-partition = None
-for n in range(M*M):
-    dfs(n, M, mTimesMemo)
-print(mTimesMemo.count(False))
