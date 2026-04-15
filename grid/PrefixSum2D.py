@@ -46,7 +46,10 @@ class PrefixSum2D:
         """累積和テーブル（1-indexed）を返却します"""
         assert self.initialized
         return self.sums
-    
+
+    def __getitem__(self, h: int):
+        return self.orig[h]
+
     @classmethod
     def makeData(cls, grid: list[list[int]]) -> "PrefixSum2D":
         """
