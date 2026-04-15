@@ -95,6 +95,15 @@ class Imos2D:
     def __len__(self)->int:
         """グリッドに反映されたデータの個数を返却します"""
         return self._num
+    
+    def __getitem__(self, h: int)->int:
+        assert self.initialized
+        assert 0 <= h < self.H
+        return self.data[h]
+    
+    def __iter__(self):
+        assert self.initialized
+        return iter(self.data)
 
 
 # ==== ABC434D
