@@ -29,21 +29,22 @@ class PrefixSum3D:
         for x in range(X):
             for y in range(Y):
                 for z in range(Z):
-                    ps[x+1][y+1][z+1] = (
+                    ps[x + 1][y + 1][z + 1] = (
                         a[x][y][z]
-                        + ps[x][y+1][z+1]
-                        + ps[x+1][y][z+1]
-                        + ps[x+1][y+1][z]
-                        - ps[x][y][z+1]
-                        - ps[x][y+1][z]
-                        - ps[x+1][y][z]
+                        + ps[x][y + 1][z + 1]
+                        + ps[x + 1][y][z + 1]
+                        + ps[x + 1][y + 1][z]
+                        - ps[x][y][z + 1]
+                        - ps[x][y + 1][z]
+                        - ps[x + 1][y][z]
                         + ps[x][y][z]
                     )
         self.initialized = True
 
     def sum(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int) -> int:
         """
-        (x1, y1, z1) を左上手前、(x2, y2, z2) を右下奥とする直方体領域（両端含む）の総和を返却します。
+        (x1, y1, z1) を左上手前、(x2, y2, z2) を右下奥とする
+        直方体領域（両端含む）の総和を返却します。
         """
         assert self.initialized
         assert 0 <= x1 <= x2 < self.X
@@ -69,9 +70,21 @@ class PrefixSum3D:
         """元のX×Y×Zデータを返却します"""
         return self.orig
 
+    def getSumTable(self) -> list[list[list[int]]]:
+        """1-indexedの累積和テーブルを返却します"""
+        assert self.initialized
+        return self.sums
+
+    def __getitem__(self, x: int):
+        """元データの x 番目スライスを返却します"""
+        return self.orig[x]
+
     @classmethod
     def makeData(cls, grid: list[list[list[int]]]) -> "PrefixSum3D":
-        """既存の3次元グリッドから累積和を構築します"""
+        """
+        既存の3次元グリッドから累積和を構築します
+        長方体配列であることを前提とします
+        """
         X = len(grid)
         Y = len(grid[0]) if X > 0 else 0
         Z = len(grid[0][0]) if Y > 0 else 0
@@ -84,6 +97,7 @@ class PrefixSum3D:
                     row_dst[z] = row_src[z]
         obj.build()
         return obj
+    
 
 N = int(input())
 A = []
