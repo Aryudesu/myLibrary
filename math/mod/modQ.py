@@ -21,22 +21,23 @@ class modQ:
     @classmethod
     def inverseMod(cls, num: int, MOD: int)-> int:
         """逆数の計算"""
-        if num in cls.denomMemo:
-            return cls.denomMemo[num]
+        if (num, MOD) in cls.denomMemo:
+            return cls.denomMemo[(num, MOD)]
         res = pow(num, MOD-2, MOD)
-        cls.denomMemo[num] = res
+        cls.denomMemo[(num, MOD)] = res
         return res
 
     def __add__(self, other):
         """加算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = self.numer * other.denom + self.denom * other.numer
             new_denom = self.denom * other.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
             new_numer = self.denom * other + self.numer
             new_denom = self.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __radd__(self, other):
@@ -46,38 +47,41 @@ class modQ:
     def __sub__(self, other):
         """減算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = self.numer * other.denom - self.denom * other.numer
             new_denom = self.denom * other.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
-            new_numer = self.denom * other - self.numer
+            new_numer = self.numer - self.denom * other
             new_denom = self.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __rsub__(self, other):
         """減算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = self.denom * other.numer - self.numer * other.denom
             new_denom = self.denom * other.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
             new_numer = self.denom * other - self.numer
             new_denom = self.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
 
     def __mul__(self, other):
         """乗算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = self.numer * other.numer
             new_denom = self.denom * other.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
             new_numer = self.numer * other
             new_denom = self.denom
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __rmul__(self, other):
@@ -85,27 +89,29 @@ class modQ:
         return self * other
 
     def __floordiv__(self, other):
-        """剰算"""
+        """除算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = self.numer * other.denom
             new_denom = self.denom * other.numer
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
             new_numer = self.numer
             new_denom = self.denom * other
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __rfloordiv__(self, other):
-        """剰算"""
+        """除算"""
         if isinstance(other, modQ):
+            assert self.MOD == other.MOD
             new_numer = other.numer * self.denom
             new_denom = other.denom * self.numer
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         elif isinstance(other, int):
             new_numer = self.denom * other
             new_denom = self.numer
-            return modQ(new_numer, new_denom)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __iadd__(self, other):
@@ -127,9 +133,13 @@ class modQ:
     def __pow__(self, other):
         """指数"""
         if isinstance(other, int):
-            new_numer = pow(self.numer, other, self.MOD)
-            new_denom = pow(self.denom, other, self.MOD)
-            return modQ(new_numer, new_denom)
+            if other >= 0:
+                new_numer = pow(self.numer, other, self.MOD)
+                new_denom = pow(self.denom, other, self.MOD)
+            else:
+                new_numer = pow(self.denom, -other, self.MOD)
+                new_denom = pow(self.numer, -other, self.MOD)
+            return modQ(new_numer, new_denom, self.MOD)
         raise Exception()
 
     def __neg__(self):
