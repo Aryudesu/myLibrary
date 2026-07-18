@@ -36,7 +36,7 @@ class LinearDiffMin:
         ok = R
         while ok - ng > 1:
             mid = (ok + ng) // 2
-            if self.calcDiff(mid+1, ignore, target) < self.calcDiff(mid, ignore, target):
+            if self.calcDiff(mid+1, ignore=ignore, target=target) < self.calcDiff(mid, ignore=ignore, target=target):
                 ng = mid
             else:
                 ok = mid
@@ -61,5 +61,5 @@ for _ in range(Q):
     p, a, b, c = map(int, input().split())
     ldm.changeLine((p-1)*2, b, a+c)
     ldm.changeLine((p-1)*2+1, b, a-c)
-    result.append(ldm.calcDcalcDiffMiniff(0, D))
+    result.append(ldm.calcDiffMin(0, D))
 print(*result, sep="\n")
