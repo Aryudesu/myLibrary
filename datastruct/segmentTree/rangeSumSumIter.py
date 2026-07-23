@@ -132,6 +132,11 @@ class RangeAddSumIter:
         """A[i] を返却します"""
         return self.sum(i, i + 1)
 
+    def set(self, i: int, v: int) -> None:
+        """A[i] を v に変更します"""
+        current = self.get(i)
+        self.point_add(i, v - current)
+
 
 # === AWC0013E
 

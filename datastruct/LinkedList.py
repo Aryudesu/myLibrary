@@ -1,4 +1,4 @@
-class InsertableList:
+class LinkedList:
     """
     挿入可能な配列管理用クラス
     同じ要素が2度使われないことが保証されていること前提
