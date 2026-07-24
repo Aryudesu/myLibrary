@@ -1,10 +1,14 @@
 from typing import Tuple
 
+Hash = Tuple[int, int]
+HashPart = Tuple[Hash, int]
+
 class RollingHash:
     """
     ダブルローリングハッシュライブラリ
     Edited by Aryu
     """
+
     def __init__(self, S: str|list[int], base1=37, MOD1=10**9 + 9, base2=157, MOD2 = 10**9 + 7):
         self.base1 = base1
         self.MOD1 = MOD1
@@ -33,14 +37,14 @@ class RollingHash:
             self.powData2[i+1] = (self.powData2[i] * self.base2) % self.MOD2
             self.hash2[i+1] = (self.hash2[i] * self.base2 + vals[i]) % self.MOD2
     
-    def get(self, l: int, r: int)-> Tuple[int, int]:
+    def get(self, l: int, r: int)-> Hash:
         """[l, r)のハッシュ値を2つ返却"""
         assert 0 <= l <= r <= self.N
         res1 = self.hash1[r] - self.hash1[l] * self.powData1[r-l]
         res2 = self.hash2[r] - self.hash2[l] * self.powData2[r-l]
         return (res1 % self.MOD1, res2 % self.MOD2)
 
-    def hashAll(self) -> Tuple[int, int]:
+    def hashAll(self) -> Hash:
         """全体のハッシュ"""
         return (self.hash1[-1], self.hash2[-1])
     
@@ -76,6 +80,23 @@ class RollingHash:
             else:
                 r = mid
         return l
+
+    def concat(self, leftHash: Hash, rightHash: Hash, rightLength:int)->Hash:
+        """2つの文字列を結合したハッシュをハッシュ値2つから取得します"""
+        lh1, lh2 = leftHash
+        rh1, rh2 = rightHash
+        hash1 = lh1 * self.powData1[rightLength] + rh1
+        hash2 = lh2 * self.powData2[rightLength] + rh2
+        return (hash1 % self.MOD1, hash2 % self.MOD2)
+
+    def concatAll(self, *parts: HashPart)->HashPart:
+        """文字列を結合したハッシュ値を計算し，ハッシュ値と文字列の長さを返却します"""
+        result: Hash = (0, 0)
+        total_length = 0
+        for part_hash, part_length in parts:
+            result = self.concat(result, part_hash, part_length)
+            total_length += part_length
+        return result, total_length
 
     def contains(self, pattern: "RollingHash")->bool:
         """包括確認を行います．"""
