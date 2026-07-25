@@ -37,8 +37,7 @@ def multiplicativeOrder(a: int, mod: int) -> int | None:
     answer: int | None = None
 
     for i in range(1, m + 1):
-        # a^(im) = a^j
-        # よって a^(im-j) = 1
+        # a^(im) = a^j → a^(im-j) = 1
         if cur in baby:
             j = baby[cur]
             x = i * m - j
@@ -48,8 +47,8 @@ def multiplicativeOrder(a: int, mod: int) -> int | None:
         cur = cur * giant_step % mod
     return answer
 
-# ABC222 G
 
+# ABC222 G
 def calc(k: int) -> int:
     # 222...2 は5の倍数にはならない
     if k % 5 == 0:
