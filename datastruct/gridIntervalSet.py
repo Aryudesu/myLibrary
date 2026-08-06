@@ -110,6 +110,11 @@ class GridIntervalSet:
         """マス x が黒く塗られているか"""
         return self._base.contains_point(x)
 
+    def iter_intervals(self):
+        """閉区間 [L, R] として列挙する"""
+        for left, right in self._base.iter_intervals():
+            yield left, right - 1
+
     @property
     def total(self) -> int:
         """覆っているマス数"""
