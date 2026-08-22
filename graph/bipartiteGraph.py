@@ -1,6 +1,12 @@
 from collections import deque
 from typing import Iterable
-
+# keywords:
+# bipartite
+# 2-coloring
+# odd cycle
+# 奇閉路
+# 奇数閉路
+# 非二部グラフ
 
 class BipartiteGraph:
     """
