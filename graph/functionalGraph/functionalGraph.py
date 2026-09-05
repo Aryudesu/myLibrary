@@ -18,7 +18,9 @@ class FunctionalGraph:
     - サイクル列挙
     - 始点から最初の再訪までの軌道取得
 
-    構築 O(N log N)、jump / distance O(log N)、その他多くは O(1)。
+    構築は通常 O(N)。
+    jump / distance / reachable を初めて使うときだけ Doubling を O(N log N) で構築する。
+    Doubling 構築後の jump / distance は O(log N)、その他多くは O(1)。
     """
 
     def __init__(self, to: Iterable[int]):
@@ -59,9 +61,10 @@ class FunctionalGraph:
 
         self._build_cycles()
         self._build_tree_information()
-
         self.cycle_size = [len(cycle) for cycle in self.cycles]
-        self._build_doubling()
+
+        self.log = max(1, self.n.bit_length())
+        self.up: list[list[int]] | None = None
 
     def _build_cycles(self) -> None:
         for start in range(self.n):
@@ -98,17 +101,23 @@ class FunctionalGraph:
                 queue.append(prev)
 
     def _build_doubling(self) -> None:
-        self.log = max(1, self.n.bit_length())
         self.up = [self.to[:]]
         for _ in range(1, self.log):
             prev = self.up[-1]
             self.up.append([prev[prev[v]] for v in range(self.n)])
+
+    def _ensure_doubling(self) -> None:
+        if self.up is None:
+            self._build_doubling()
 
     def _validate_vertex(self, v: int) -> None:
         if not 0 <= v < self.n:
             raise IndexError(f"頂点は 0 以上 {self.n} 未満である必要があります")
 
     def _jump_small(self, v: int, k: int) -> int:
+        self._ensure_doubling()
+        assert self.up is not None
+
         bit = 0
         while k:
             if k & 1:
@@ -135,7 +144,7 @@ class FunctionalGraph:
         return cycle[(position + remaining) % len(cycle)]
 
     def kth(self, start: int, k: int) -> int:
-        """旧 functional.py の kth 相当。start から k 回遷移した先を返す。"""
+        """start から k 回遷移した先を返す。"""
         return self.jump(start, k)
 
     def distance(self, u: int, v: int) -> int | None:
