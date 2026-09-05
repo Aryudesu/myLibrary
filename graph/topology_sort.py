@@ -1,55 +1,156 @@
-from collections import deque
+from collections import defaultdict, deque
+from heapq import heappop, heappush
 
 
-class Graph:
-    def __init__(self, N):
-        self.N = N
-        self.graph = [[] for _ in range(N)]
-        self.indegree = [0] * N
+class TopologicalSort:
+    """
+    トポロジカルソート用有向グラフ（0-indexed）。
 
-    def add_edge(self, a, b):
-        """辺の追加"""
-        self.graph[a].append(b)
-        self.indegree[b] += 1
+    - 通常のトポロジカルソート
+    - 辞書順最小のトポロジカルソート
+    - 順序の一意性判定
+    - DAG判定
+    - 多重辺対応
+    - 辺・パスの追加削除
 
-    def sort(self):
+    同じ u -> v が複数本存在する場合、トポロジカルソート上は1本の制約として扱い、
+    最後の1本を削除したときだけ入次数を減らします。
+    """
+
+    def __init__(self, n: int):
+        self.n = n
+        self.graph = [set() for _ in range(n)]
+        self.indegree = [0] * n
+        self.edge_count = defaultdict(int)
+
+    def add_edge(self, u: int, v: int) -> None:
+        """u -> v を1本追加します。"""
+        key = (u, v)
+        if self.edge_count[key] == 0:
+            self.graph[u].add(v)
+            self.indegree[v] += 1
+        self.edge_count[key] += 1
+
+    def remove_edge(self, u: int, v: int) -> bool:
         """
-        トポロジカルソート
-        戻り値は result[頂点番号] = 何番目か
+        u -> v を1本削除します。
+        辺が存在しない場合は False、削除できた場合は True を返します。
         """
-        queue = deque()
-        for i in range(self.N):
-            if self.indegree[i] == 0:
-                queue.append(i)
-        topo_order = []
+        key = (u, v)
+        if self.edge_count[key] == 0:
+            return False
+
+        self.edge_count[key] -= 1
+        if self.edge_count[key] == 0:
+            self.graph[u].remove(v)
+            self.indegree[v] -= 1
+        return True
+
+    def add_path(self, path: list[int]) -> None:
+        """path[0] -> path[1] -> ... の辺を追加します。"""
+        for u, v in zip(path, path[1:]):
+            self.add_edge(u, v)
+
+    def remove_path(self, path: list[int]) -> bool:
+        """
+        path[0] -> path[1] -> ... の辺を1本ずつ削除します。
+        全ての辺を削除できた場合は True を返します。
+        """
+        removed_all = True
+        for u, v in zip(path, path[1:]):
+            removed_all &= self.remove_edge(u, v)
+        return removed_all
+
+    def has_edge(self, u: int, v: int) -> bool:
+        """u -> v が1本以上存在するかを返します。"""
+        return self.edge_count[(u, v)] > 0
+
+    def edge_multiplicity(self, u: int, v: int) -> int:
+        """u -> v の多重度を返します。"""
+        return self.edge_count[(u, v)]
+
+    def sort(self) -> list[int]:
+        """通常のトポロジカルソートを返します。閉路がある場合は空配列を返します。"""
+        indegree = self.indegree.copy()
+        queue = deque(i for i in range(self.n) if indegree[i] == 0)
+        order = []
+
+        while queue:
+            v = queue.popleft()
+            order.append(v)
+            for nv in self.graph[v]:
+                indegree[nv] -= 1
+                if indegree[nv] == 0:
+                    queue.append(nv)
+
+        if len(order) != self.n:
+            return []
+        return order
+
+    def sort_lexicographical(self) -> list[int]:
+        """辞書順最小のトポロジカルソートを返します。閉路がある場合は空配列を返します。"""
+        indegree = self.indegree.copy()
+        heap = []
+
+        for i in range(self.n):
+            if indegree[i] == 0:
+                heappush(heap, i)
+
+        order = []
+        while heap:
+            v = heappop(heap)
+            order.append(v)
+            for nv in self.graph[v]:
+                indegree[nv] -= 1
+                if indegree[nv] == 0:
+                    heappush(heap, nv)
+
+        if len(order) != self.n:
+            return []
+        return order
+
+    def sort_unique(self) -> tuple[bool, list[int]]:
+        """
+        一意性判定付きトポロジカルソートを行います。
+
+        戻り値:
+            (一意であるか, 順序)
+
+        閉路がある場合は (False, []) を返します。
+        """
+        indegree = self.indegree.copy()
+        queue = deque(i for i in range(self.n) if indegree[i] == 0)
+        order = []
+        is_unique = True
+
         while queue:
             if len(queue) > 1:
-                return None
-            current = queue.popleft()
-            topo_order.append(current)
-            for neighbor in self.graph[current]:
-                self.indegree[neighbor] -= 1
-                if self.indegree[neighbor] == 0:
-                    queue.append(neighbor)
-        if len(topo_order) != self.N:
+                is_unique = False
+
+            v = queue.popleft()
+            order.append(v)
+            for nv in self.graph[v]:
+                indegree[nv] -= 1
+                if indegree[nv] == 0:
+                    queue.append(nv)
+
+        if len(order) != self.n:
+            return False, []
+        return is_unique, order
+
+    def is_dag(self) -> bool:
+        """現在のグラフがDAG（有向非巡回グラフ）かを返します。"""
+        return len(self.sort()) == self.n
+
+    def order_to_rank(self, order: list[int]) -> list[int]:
+        """
+        order[何番目] = 頂点番号 から
+        rank[頂点番号] = 何番目（1-indexed）を作ります。
+        """
+        if not order:
             return []
-        return topo_order
 
-
-# === ABC291E
-
-N, M = [int(l) for l in input().split()]
-graph = Graph(N)
-for _ in range(M):
-    x, y = [int(l) - 1 for l in input().split()]
-    graph.add_edge(x, y)
-
-topo_order = graph.sort()
-if topo_order:
-    result_arr = [0] * N
-    for i in range(N):
-        result_arr[topo_order[i]] = i + 1
-    print("Yes")
-    print(*result_arr)
-else:
-    print("No")
+        rank = [0] * self.n
+        for i, v in enumerate(order):
+            rank[v] = i + 1
+        return rank
