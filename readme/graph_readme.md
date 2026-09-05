@@ -31,6 +31,36 @@ Euler Tour や LCA が不要な場合はこちらを使う。
 
 辺追加などの基本機能は `Tree` から継承する。
 
+## graph/functionalGraph/functionalGraph
+
+Functional Graph 用クラス。
+
+- サイクル分解
+- 各頂点からサイクルまでの距離
+- サイクルへの入口
+- `jump(v, k)` / `kth(start, k)`
+- 到達可能性・最短遷移回数
+- 弱連結成分判定
+- サイクル列挙
+- `orbit(start)` で最初の再訪までの軌道取得
+- `distinct_orbit_size(v)`
+
+旧 `functional.py` の始点固定解析機能もこのクラスへ統合済み。
+
+## graph/parentTree
+
+`P[v] < v` が保証された親配列形式の根付き木用クラス。
+
+- 親取得
+- k 個上の祖先
+- LCA
+- 距離
+- 祖先判定
+- パス復元
+- 子リスト構築
+
+Functional Graph とは用途が異なるため別クラスとして管理する。
+
 ## graph/topology_sort
 
 トポロジカルソート。
