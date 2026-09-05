@@ -1,10 +1,12 @@
-class EulerTourTree:
-    """
-    オイラーツアー + RMQ による木ユーティリティ。
+from graph.tree import Tree
 
-    頂点は 0-indexed。
-    辺の重みを省略した場合は 1 として扱うため、
-    無重み木と重み付き木を同じクラスで扱える。
+
+class EulerTourTree(Tree):
+    """
+    Euler Tour + RMQ による根付き木ユーティリティ。
+
+    Tree を継承しているため、辺追加や木の直径などの基本機能は Tree 側を使う。
+    辺の重みを省略した場合は 1 として扱う。
 
     主な機能:
     - LCA
@@ -15,31 +17,31 @@ class EulerTourTree:
     - 根からの重み付き距離
     - 静的な頂点コストの部分木和 / パス和
     - 静的な辺コストの部分木和
-    - 木の直径計算用の最遠点取得
     """
 
     def __init__(self, n: int):
-        self.n = n
-        self.graph = [[] for _ in range(n)]
-        self.node_cost = [0] * n
+        super().__init__(n)
         self._built = False
 
     def add_edge(self, u: int, v: int, weight: int = 1) -> None:
-        """無向辺 u-v を追加する。weight のデフォルトは 1。"""
-        self.graph[u].append((v, weight))
-        self.graph[v].append((u, weight))
+        """無向辺 u-v を追加する。追加後は build() が必要になる。"""
+        super().add_edge(u, v, weight)
         self._built = False
 
     def set_node_cost(self, costs: list[int]) -> None:
         """各頂点の静的コストを設定する。"""
-        assert len(costs) == self.n
-        self.node_cost = list(costs)
+        super().set_node_cost(costs)
         if self._built:
             self._build_cost_data()
 
     def build(self, root: int = 0) -> None:
-        """root を根としてオイラーツアー・LCA用RMQ等を構築する。"""
+        """root を根として Euler Tour・LCA用RMQ等を構築する。"""
         n = self.n
+        if n == 0:
+            self.root = -1
+            self._built = True
+            return
+
         self.root = root
         self.parent = [-1] * n
         self.depth = [0] * n
@@ -107,7 +109,7 @@ class EulerTourTree:
         self._build_cost_data()
 
     def _build_rmq(self) -> None:
-        """Euler列上のdepth最小位置を返すSparse Tableを構築する。"""
+        """Euler列上のdepth最小位置を返す Sparse Table を構築する。"""
         m = len(self.euler)
 
         self._log = [0] * (m + 1)
@@ -236,27 +238,7 @@ class EulerTourTree:
             + self.node_cost[a]
         )
 
-    def longest_node(self, start: int) -> tuple[int, int]:
-        """
-        start から最も重み付き距離が遠い頂点と距離を返す。
-        木で辺重みが非負の場合を想定。
-        """
-        dist = [None] * self.n
-        dist[start] = 0
-        stack = [(start, -1)]
-
-        while stack:
-            v, p = stack.pop()
-            for to, weight in self.graph[v]:
-                if to == p:
-                    continue
-                dist[to] = dist[v] + weight
-                stack.append((to, v))
-
-        farthest = max(range(self.n), key=lambda v: dist[v])
-        return farthest, dist[farthest]
-
-    # tree.py で使っていた名前との互換用
+    # 旧 tree.py で使っていた名前との互換用
     def subtree_cost_node(self, v: int) -> int:
         return self.get_subtree_node_cost(v)
 
