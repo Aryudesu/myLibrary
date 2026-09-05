@@ -45,6 +45,10 @@ Functional Graph 用クラス。
 - `orbit(start)` で最初の再訪までの軌道取得
 - `distinct_orbit_size(v)`
 
+基本構築は時間・メモリともに `O(N)`。
+Doubling は木部分を途中までジャンプする必要が生じたときだけ遅延構築し、追加で `O(N log N)` の時間・メモリを使う。
+サイクル情報や `distinct_orbit_size()` だけを使う場合は Doubling を構築しない。
+
 旧 `functional.py` の始点固定解析機能もこのクラスへ統合済み。
 
 ## graph/parentTree
