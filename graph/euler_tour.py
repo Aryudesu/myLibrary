@@ -237,22 +237,3 @@ class EulerTourTree(Tree):
             - 2 * self._root_node_cost[a]
             + self.node_cost[a]
         )
-
-    # 旧 tree.py で使っていた名前との互換用
-    def subtree_cost_node(self, v: int) -> int:
-        return self.get_subtree_node_cost(v)
-
-    def subtree_cost_edge(self, v: int) -> int:
-        return self.get_subtree_edge_cost(v)
-
-    def root_node_cost(self, v: int) -> int:
-        return self.get_root_node_cost(v)
-
-    def root_edge_cost(self, v: int) -> int:
-        return self.get_root_distance(v)
-
-    def dist_two_node_node(self, u: int, v: int) -> int:
-        return self.get_path_node_cost(u, v)
-
-    def dist_two_node_edge(self, u: int, v: int) -> int:
-        return self.get_distance(u, v)
