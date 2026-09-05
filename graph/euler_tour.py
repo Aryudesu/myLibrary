@@ -1,107 +1,276 @@
-from collections import defaultdict
-
-
 class EulerTourTree:
-    def __init__(self, n):
+    """
+    オイラーツアー + RMQ による木ユーティリティ。
+
+    頂点は 0-indexed。
+    辺の重みを省略した場合は 1 として扱うため、
+    無重み木と重み付き木を同じクラスで扱える。
+
+    主な機能:
+    - LCA
+    - 祖先判定
+    - 部分木サイズ
+    - 2頂点間の辺数
+    - 2頂点間の重み付き距離
+    - 根からの重み付き距離
+    - 静的な頂点コストの部分木和 / パス和
+    - 静的な辺コストの部分木和
+    - 木の直径計算用の最遠点取得
+    """
+
+    def __init__(self, n: int):
         self.n = n
-        self.graph = defaultdict(list)
+        self.graph = [[] for _ in range(n)]
+        self.node_cost = [0] * n
+        self._built = False
+
+    def add_edge(self, u: int, v: int, weight: int = 1) -> None:
+        """無向辺 u-v を追加する。weight のデフォルトは 1。"""
+        self.graph[u].append((v, weight))
+        self.graph[v].append((u, weight))
+        self._built = False
+
+    def set_node_cost(self, costs: list[int]) -> None:
+        """各頂点の静的コストを設定する。"""
+        assert len(costs) == self.n
+        self.node_cost = list(costs)
+        if self._built:
+            self._build_cost_data()
+
+    def build(self, root: int = 0) -> None:
+        """root を根としてオイラーツアー・LCA用RMQ等を構築する。"""
+        n = self.n
+        self.root = root
+        self.parent = [-1] * n
+        self.depth = [0] * n
+        self.root_dist = [0] * n
+        self.parent_edge_weight = [0] * n
+        self.tin = [-1] * n
+        self.tout = [-1] * n
+        self.subtree_size = [0] * n
+
         self.euler = []
-        self.first = dict()
-        self.depth = []
-        self.seg_tree = []
-        self.subtree_size = dict()
-        self.time_in = dict()
-        self.time_out = dict()
-        self.timer = 0
+        self.euler_depth = []
+        self.first = [-1] * n
 
-    def add_edge(self, u, v):
-        """グラフに辺を追加（defaultdictを活用）"""
-        self.graph[u].append(v)
-        self.graph[v].append(u)
+        order = []
+        timer = 0
 
-    def dfs(self, v, p, d):
-        """DFSでオイラーツアーを構築"""
-        self.first[v] = len(self.euler)
-        self.time_in[v] = self.timer
-        self.timer += 1
-        self.euler.append(v)
-        self.depth.append(d)
-        self.subtree_size[v] = 1
+        # (vertex, parent, parent_edge_weight, state)
+        # state=0: 入る, state=1: 出る, state=2: 子から戻る
+        stack = [(root, -1, 0, 0)]
 
-        for to in self.graph[v]:
-            if to == p:
-                continue
-            self.dfs(to, v, d + 1)
-            self.euler.append(v)
-            self.depth.append(d)
-            self.subtree_size[v] += self.subtree_size[to]
+        while stack:
+            v, p, w, state = stack.pop()
 
-        self.time_out[v] = self.timer
-        self.timer += 1
+            if state == 0:
+                self.parent[v] = p
+                self.parent_edge_weight[v] = w
 
-    def build(self, root=0):
-        """木を構築してオイラーツアーとRMQを用意"""
-        self.dfs(root, -1, 0)
+                if p != -1:
+                    self.depth[v] = self.depth[p] + 1
+                    self.root_dist[v] = self.root_dist[p] + w
+
+                self.tin[v] = timer
+                timer += 1
+                order.append(v)
+
+                self.first[v] = len(self.euler)
+                self.euler.append(v)
+                self.euler_depth.append(self.depth[v])
+
+                stack.append((v, p, w, 1))
+
+                children = [(to, cost) for to, cost in self.graph[v] if to != p]
+                for to, cost in reversed(children):
+                    stack.append((v, p, w, 2))
+                    stack.append((to, v, cost, 0))
+
+            elif state == 2:
+                self.euler.append(v)
+                self.euler_depth.append(self.depth[v])
+
+            else:
+                # preorder の半開区間 [tin[v], tout[v]) が部分木になる
+                self.tout[v] = timer
+
+        self._order = order
+
+        self.subtree_size = [1] * n
+        for v in reversed(order):
+            p = self.parent[v]
+            if p != -1:
+                self.subtree_size[p] += self.subtree_size[v]
+
         self._build_rmq()
+        self._built = True
+        self._build_cost_data()
 
-    def _build_rmq(self):
-        """RMQ (Sparse Table) を構築"""
+    def _build_rmq(self) -> None:
+        """Euler列上のdepth最小位置を返すSparse Tableを構築する。"""
         m = len(self.euler)
-        log_m = (m - 1).bit_length()
-        self.seg_tree = [[0] * m for _ in range(log_m)]
-        self.seg_tree[0] = list(range(m))
 
-        for i in range(1, log_m):
-            for j in range(m - (1 << i) + 1):
-                left = self.seg_tree[i - 1][j]
-                right = self.seg_tree[i - 1][j + (1 << (i - 1))]
-                self.seg_tree[i][j] = (
-                    left if self.depth[left] < self.depth[right] else right
+        self._log = [0] * (m + 1)
+        for i in range(2, m + 1):
+            self._log[i] = self._log[i // 2] + 1
+
+        self._st = [list(range(m))]
+        k = 1
+        while (1 << k) <= m:
+            prev = self._st[-1]
+            half = 1 << (k - 1)
+            width = 1 << k
+            row = [0] * (m - width + 1)
+
+            for i in range(len(row)):
+                left = prev[i]
+                right = prev[i + half]
+                row[i] = (
+                    left
+                    if self.euler_depth[left] <= self.euler_depth[right]
+                    else right
                 )
 
-    def get_lca(self, u, v):
-        """LCA (最小共通祖先) を求める"""
-        l, r = self.first[u], self.first[v]
+            self._st.append(row)
+            k += 1
+
+    def _build_cost_data(self) -> None:
+        """静的な頂点コスト・辺コストに関する累積値を構築する。"""
+        n = self.n
+        self._root_node_cost = [0] * n
+
+        for v in self._order:
+            p = self.parent[v]
+            if p == -1:
+                self._root_node_cost[v] = self.node_cost[v]
+            else:
+                self._root_node_cost[v] = self._root_node_cost[p] + self.node_cost[v]
+
+        self._subtree_node_cost = self.node_cost.copy()
+        self._subtree_edge_cost = [0] * n
+
+        for v in reversed(self._order):
+            p = self.parent[v]
+            if p != -1:
+                self._subtree_node_cost[p] += self._subtree_node_cost[v]
+                self._subtree_edge_cost[p] += (
+                    self._subtree_edge_cost[v] + self.parent_edge_weight[v]
+                )
+
+    def _ensure_built(self) -> None:
+        if not self._built:
+            self.build(0)
+
+    def get_lca(self, u: int, v: int) -> int:
+        """u, v の最近共通祖先を返す。"""
+        self._ensure_built()
+        l = self.first[u]
+        r = self.first[v]
         if l > r:
             l, r = r, l
-        log_len = (r - l + 1).bit_length() - 1
-        left = self.seg_tree[log_len][l]
-        right = self.seg_tree[log_len][r - (1 << log_len) + 1]
+
+        k = self._log[r - l + 1]
+        left = self._st[k][l]
+        right = self._st[k][r - (1 << k) + 1]
+        index = (
+            left
+            if self.euler_depth[left] <= self.euler_depth[right]
+            else right
+        )
+        return self.euler[index]
+
+    def lca(self, u: int, v: int) -> int:
+        """get_lca の別名。"""
+        return self.get_lca(u, v)
+
+    def is_ancestor(self, u: int, v: int) -> bool:
+        """u が v の祖先であるか判定する。自分自身も祖先とみなす。"""
+        self._ensure_built()
+        return self.tin[u] <= self.tin[v] < self.tout[u]
+
+    def get_subtree_size(self, v: int) -> int:
+        """v を根とする部分木の頂点数を返す。"""
+        self._ensure_built()
+        return self.subtree_size[v]
+
+    def get_path_length(self, u: int, v: int) -> int:
+        """u-v パスの辺数を返す。辺の重みは考慮しない。"""
+        self._ensure_built()
+        a = self.get_lca(u, v)
+        return self.depth[u] + self.depth[v] - 2 * self.depth[a]
+
+    def get_distance(self, u: int, v: int) -> int:
+        """u-v パスの辺重みの総和を返す。"""
+        self._ensure_built()
+        a = self.get_lca(u, v)
+        return self.root_dist[u] + self.root_dist[v] - 2 * self.root_dist[a]
+
+    def get_root_distance(self, v: int) -> int:
+        """root-v パスの辺重みの総和を返す。"""
+        self._ensure_built()
+        return self.root_dist[v]
+
+    def get_subtree_node_cost(self, v: int) -> int:
+        """v の部分木に含まれる頂点コストの総和を返す。"""
+        self._ensure_built()
+        return self._subtree_node_cost[v]
+
+    def get_subtree_edge_cost(self, v: int) -> int:
+        """v の部分木内部に含まれる辺重みの総和を返す。"""
+        self._ensure_built()
+        return self._subtree_edge_cost[v]
+
+    def get_root_node_cost(self, v: int) -> int:
+        """root-v パスに含まれる頂点コストの総和を返す。"""
+        self._ensure_built()
+        return self._root_node_cost[v]
+
+    def get_path_node_cost(self, u: int, v: int) -> int:
+        """u-v パスに含まれる頂点コストの総和を返す。"""
+        self._ensure_built()
+        a = self.get_lca(u, v)
         return (
-            self.euler[left]
-            if self.depth[left] < self.depth[right]
-            else self.euler[right]
+            self._root_node_cost[u]
+            + self._root_node_cost[v]
+            - 2 * self._root_node_cost[a]
+            + self.node_cost[a]
         )
 
-    def get_subtree_size(self, v):
-        """部分木のサイズを取得"""
-        return self.subtree_size.get(v, 0)
+    def longest_node(self, start: int) -> tuple[int, int]:
+        """
+        start から最も重み付き距離が遠い頂点と距離を返す。
+        木で辺重みが非負の場合を想定。
+        """
+        dist = [None] * self.n
+        dist[start] = 0
+        stack = [(start, -1)]
 
-    def is_ancestor(self, u, v):
-        """u が v の祖先か判定"""
-        return (
-            self.time_in[u] <= self.time_in[v] and self.time_out[v] <= self.time_out[u]
-        )
+        while stack:
+            v, p = stack.pop()
+            for to, weight in self.graph[v]:
+                if to == p:
+                    continue
+                dist[to] = dist[v] + weight
+                stack.append((to, v))
 
-    def get_path_length(self, u, v):
-        """u から v へのパスの長さ"""
-        lca = self.get_lca(u, v)
-        return (self.depth[self.first[u]] - self.depth[self.first[lca]]) + (
-            self.depth[self.first[v]] - self.depth[self.first[lca]]
-        )
+        farthest = max(range(self.n), key=lambda v: dist[v])
+        return farthest, dist[farthest]
 
+    # tree.py で使っていた名前との互換用
+    def subtree_cost_node(self, v: int) -> int:
+        return self.get_subtree_node_cost(v)
 
-# 例: 使用方法
-n = 7
-ett = EulerTourTree(n)
-edges = [(0, 1), (0, 2), (1, 3), (1, 4), (2, 5), (2, 6)]
-for u, v in edges:
-    ett.add_edge(u, v)
+    def subtree_cost_edge(self, v: int) -> int:
+        return self.get_subtree_edge_cost(v)
 
-ett.build(root=0)
-print("LCA(3, 4):", ett.get_lca(3, 4))  # 1
-print("LCA(3, 5):", ett.get_lca(3, 5))  # 0
-print("Subtree size of node 1:", ett.get_subtree_size(1))  # 3
-print("Subtree size of node 0:", ett.get_subtree_size(0))  # 7
-print("Path length 3 -> 5:", ett.get_path_length(3, 5))  # 4
-print("Is 1 ancestor of 3?", ett.is_ancestor(1, 3))  # True
+    def root_node_cost(self, v: int) -> int:
+        return self.get_root_node_cost(v)
+
+    def root_edge_cost(self, v: int) -> int:
+        return self.get_root_distance(v)
+
+    def dist_two_node_node(self, u: int, v: int) -> int:
+        return self.get_path_node_cost(u, v)
+
+    def dist_two_node_edge(self, u: int, v: int) -> int:
+        return self.get_distance(u, v)
