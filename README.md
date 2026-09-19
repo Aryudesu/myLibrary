@@ -23,6 +23,11 @@ AtCoderの問題（練習問題含む）で触った内容に触れてたり，�
 特定の関数について
 [readme/func_readme.md](readme/func_readme.md)を参照
 
+### dp
+
+動的計画法、および関連アルゴリズムについて
+[readme/dp_readme.md](readme/dp_readme.md)を参照
+
 ### graph
 
 グラフ関連について
