@@ -8,6 +8,11 @@ AtCoderの問題（練習問題含む）で触った内容に触れてたり，�
 
 ## 内容物
 
+### algorithm
+
+汎用アルゴリズムについて
+[readme/algorithm_readme.md](readme/algorithm_readme.md)を参照
+
 ### brute_force
 
 全探索関連
