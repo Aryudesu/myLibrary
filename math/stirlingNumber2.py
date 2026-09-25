@@ -43,6 +43,39 @@ class StirlingNumber2:
         return self.data[n][k]
 
 
+def stirlingNumber2Row(n: int, mod: int = 998244353) -> list[int]:
+    """
+    第二種スターリング数の第 n 行
+    [S(n, 0), S(n, 1), ..., S(n, n)] を計算する。
+
+    漸化式
+        S(i, k) = k * S(i - 1, k) + S(i - 1, k - 1)
+    を k の降順に更新することで、1 次元配列だけで計算する。
+
+    固定した n に対する S(n, k) を全て必要とするが、
+    それ以前の行を保持する必要がない場合に適している。
+
+    計算量:
+        O(n^2)
+    空間計算量:
+        O(n)
+    """
+    assert n >= 0
+
+    dp = [0] * (n + 1)
+    dp[0] = 1
+
+    for i in range(1, n + 1):
+        for k in range(i, 0, -1):
+            value = k * dp[k] + dp[k - 1]
+            if mod > 0:
+                value %= mod
+            dp[k] = value
+        dp[0] = 0
+
+    return dp
+
+
 def stirlingNumber2(n: int, k: int, mod: int = 998244353) -> int:
     """
     第二種スターリング数 S(n, k) を単体で計算する。
