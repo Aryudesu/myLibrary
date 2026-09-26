@@ -47,3 +47,16 @@
 となる区間へ分解する。
 
 bit DP、popcount、巨大整数区間などで、2冪境界に揃った区間へ分割したい場合に利用する。
+
+## treeMo.py
+
+`TreeMo`
+
+木上のパスクエリを Mo's Algorithm で処理する。
+
+- 各頂点を行きがけ・帰りがけに記録する長さ `2N` の Euler Tour を構築
+- 区間内で奇数回登場する頂点を現在集合として管理
+- LCA を一時的に追加することで任意の `s-t` パスを表現
+- `addVertex` / `removeVertex` / `getAnswer(queryIndex)` を問題ごとに差し替えて利用
+
+前処理は `O(N log N)`。Mo 部分は add/remove が `O(F)` のとき、おおむね `O(N sqrt(Q) F + Q log N)`。
