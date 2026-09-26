@@ -97,3 +97,16 @@ Trieクラスの作成を行います．
 ### starts_with(prefix)
 
 先頭一致でデータの取得を行います
+
+## segmentTree/rangeAddRangeSum
+
+`RangeAddRangeSum`
+
+遅延セグメント木による区間加算・区間和取得。
+
+- `range_add(l, r, x)` : 半開区間 `[l, r)` に `x` を加算
+- `range_sum(l, r)` : 半開区間 `[l, r)` の総和
+- `all_sum()` : 全体の総和
+- `get(i)` : `i` 番目の値
+
+構築 `O(N)`、更新・取得 `O(log N)`。
