@@ -5,11 +5,10 @@ def hilbertOrder(x: int, y: int, bits: int) -> int:
     再帰を使わない反復実装。
     Mo's Algorithm のクエリ順序付けに利用できる。
     """
-    n = 1 << bits
     d = 0
-    s = n >> 1
 
-    while s:
+    for k in range(bits - 1, -1, -1):
+        s = 1 << k
         rx = 1 if x & s else 0
         ry = 1 if y & s else 0
 
@@ -17,11 +16,9 @@ def hilbertOrder(x: int, y: int, bits: int) -> int:
 
         if ry == 0:
             if rx == 1:
-                x = n - 1 - x
-                y = n - 1 - y
+                x = s - 1 - x
+                y = s - 1 - y
             x, y = y, x
-
-        s >>= 1
 
     return d
 
@@ -60,6 +57,6 @@ def sortMoQueriesHilbert(
         (hilbertOrder(l, r, bits), l, r, w, qi)
         for l, r, w, qi in queries
     ]
-    decorated.sort(key=lambda x: x[0])
+    decorated.sort()
 
     return [(l, r, w, qi) for _, l, r, w, qi in decorated]
