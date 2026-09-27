@@ -60,3 +60,22 @@ bit DP、popcount、巨大整数区間などで、2冪境界に揃った区間�
 - `addVertex` / `removeVertex` / `getAnswer(queryIndex)` を問題ごとに差し替えて利用
 
 前処理は `O(N log N)`。Mo 部分は add/remove が `O(F)` のとき、おおむね `O(N sqrt(Q) F + Q log N)`。
+
+## treeMoInline.py
+
+`TreeMoInline`
+
+Pythonで木上Moのホットループを問題側へ直書きしたい場合の軽量版。
+
+- Euler Tour
+- `tin / tout`
+- LCA
+- `(s, t)` から `(l, r, lca, queryIndex)` への変換
+- Mo順へのクエリ整列
+
+までをライブラリ側で行い、`add/remove/getAnswer` のコールバック呼び出しは行わない。
+
+`getOrderedQueries()` で並べ替え済みクエリを取得し、区間伸縮・toggle・回答処理を問題側にベタ書きすることで、Pythonの関数呼び出しオーバーヘッドを減らせる。
+
+通常版 `TreeMo` が書きやすさ優先、こちらは速度優先。
+
