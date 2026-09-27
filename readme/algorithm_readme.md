@@ -79,3 +79,20 @@ Pythonで木上Moのホットループを問題側へ直書きしたい場合の
 
 通常版 `TreeMo` が書きやすさ優先、こちらは速度優先。
 
+## hilbertMo.py
+
+`hilbertOrder(x, y, bits)` / `sortMoQueriesHilbert(queries, maxCoord)`
+
+Mo's Algorithm のクエリ `(l, r)` を Hilbert order で並べる補助関数。
+
+`TreeMoInline` と組み合わせる場合は、
+
+```python
+ordered = sortMoQueriesHilbert(tm.queries, len(tm.euler))
+```
+
+として利用する。
+
+通常のブロック分割 Mo より L/R の総移動量が減る場合があるが、
+Hilbert index の計算自体にもコストがあるため、常に高速になるとは限らない。
+
