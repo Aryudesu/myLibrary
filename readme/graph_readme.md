@@ -75,3 +75,13 @@ Functional Graph とは用途が異なるため別クラスとして管理する
 - DAG判定
 - 多重辺対応
 - 辺・パスの追加削除
+
+## graph/dijkstra_array
+
+配列ベースの隣接リスト `graph[v] = [(to, cost), ...]` 用の軽量 Dijkstra。
+
+- `dijkstra(graph, start)` : 各頂点への最短距離を返す
+- `dijkstra_with_prev(graph, start)` : 最短距離と経路復元用 `prev` を返す
+- `restore_path(prev, start, goal)` : 最短路を復元する
+
+頂点数が事前に分かる AtCoder 向け。計算量は `O((N + M) log N)`。
