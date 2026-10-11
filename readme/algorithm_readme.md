@@ -96,3 +96,24 @@ ordered = sortMoQueriesHilbert(tm.queries, len(tm.euler))
 通常のブロック分割 Mo より L/R の総移動量が減る場合があるが、
 Hilbert index の計算自体にもコストがあるため、常に高速になるとは限らない。
 
+## weightedMedian.py
+
+`weightedMedian(values, weights)`
+
+非負重みの絶対距離和 `sum(w[i] * abs(x - values[i]))` を最小化する
+重み付き中央値を返す。最適解が区間になる場合は左端を返す。
+`Fraction` など比較できる有理数にも対応。重み総和 0 は `ValueError`。
+計算量は `O(N log N)`。
+
+## treeImos.py
+
+`TreeImos(graph, root=0)`
+
+0-indexed 無向木を根付き木として扱い、以下を提供する。
+
+- `parent[v]`, `subtreeSize[v]`: 親と部分木サイズ
+- `addSubtree(v, x)`: 部分木全体への加算
+- `addOutsideSubtree(v, x)`: 部分木以外への加算
+- `build()`: 全頂点の加算結果を取得
+
+非再帰 DFS。初期化・集計 `O(N)`、加算 `O(1)`。
