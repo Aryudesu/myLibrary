@@ -1,10 +1,26 @@
+"""ACL LazySegTree の設定を再利用するためのテンプレート。"""
+
 from atcoder.lazysegtree import LazySegTree
 
 
-class LazySegBase:
-    def __init__(self, lst):
+class LazySegMapper:
+    """遅延セグ木の演算を派生クラスで設定するためのラッパー。
+
+    派生クラスでは以下の5つのメソッドを定義する。
+
+    - op(a, b): 区間情報を左 a、右 b の順序で結合
+    - e(): 区間情報の単位元
+    - mapping(f, x): 遅延操作 f を区間情報 x に適用
+    - composition(f, g): g を適用した後に f を適用する操作（f ∘ g）
+    - id(): 遅延操作の単位元
+
+    インデックスは 0-indexed、区間は半開区間 [l, r)。
+    max_right / min_left の述語は単位元 e() に対して True を返す必要がある。
+    """
+
+    def __init__(self, data):
         self.lst = LazySegTree(
-            self.op, self.e(), self.mapping, self.composition, self.id(), lst
+            self.op, self.e(), self.mapping, self.composition, self.id(), data
         )
 
     def set(self, p, x):
@@ -20,22 +36,22 @@ class LazySegBase:
         return self.lst.all_prod()
 
     def apply(self, l, r, f):
+        """半開区間 [l, r) に遅延操作 f を適用する。"""
         self.lst.apply(l, r, f)
 
+    def max_right(self, l, predicate):
+        return self.lst.max_right(l, predicate)
 
-class LazySegChmax(LazySegBase):
-    """
-    ACL LazySegTree 用設定:
+    def min_left(self, r, predicate):
+        return self.lst.min_left(r, predicate)
 
-    * op(a, b): セグメント木に乗る要素の二項演算
-        例：min(a, b), max(a, b), a + b など
-    * mapping(f, x): 遅延評価値 f を値 x に適用
-        ex: "加算": f + x, "chmax": max(f, x), "代入": f
-    * composition(f, g): 遅延値同士の合成（f を先に適用）
-        ex: "加算": f + g, "代入": f（g を無視）
-    * e(): 本体データの単位元
-    * id(): 遅延データの単位元（影響を与えない値）
-    """
+
+# 旧名称を使ったコードとの互換性のために残す。
+LazySegBase = LazySegMapper
+
+
+class LazySegChmax(LazySegMapper):
+    """区間 chmax（各要素を max(元の値, f) に変更）・区間最大値。"""
 
     def op(self, a, b):
         return max(a, b)
@@ -47,30 +63,53 @@ class LazySegChmax(LazySegBase):
         return max(f, g)
 
     def e(self):
-        return -(10**10)
+        return float("-inf")
 
     def id(self):
-        return -(10**10)
+        return float("-inf")
 
 
-# === ABC382F
+class LazySegRangeAddMin(LazySegMapper):
+    """区間加算・区間最小値取得。"""
 
-H, W, N = [int(l) for l in input().split()]
-ls = [0] * W
-lst = LazySegChmax(ls)
-data = []
-for n in range(N):
-    tmp = [int(l) for l in input().split()]
-    tmp[1] -= 1
-    tmp.append(n)
-    data.append(tmp)
-data.sort(reverse=True)
-result = []
-for dat in data:
-    y, x, l, num = dat
-    h = lst.prod(x, x + l)
-    lst.apply(x, x + l, h + 1)
-    result.append([num, H - h])
-result.sort()
-for r in result:
-    print(r[1])
+    def op(self, a, b):
+        return min(a, b)
+
+    def mapping(self, f, x):
+        return f + x
+
+    def composition(self, f, g):
+        return f + g
+
+    def e(self):
+        return float("inf")
+
+    def id(self):
+        return 0
+
+
+def _example_main():
+    """元のテンプレートに含まれていた利用例（直接実行したときだけ動作）。"""
+    H, W, N = [int(l) for l in input().split()]
+    ls = [0] * W
+    lst = LazySegChmax(ls)
+    data = []
+    for n in range(N):
+        tmp = [int(l) for l in input().split()]
+        tmp[1] -= 1
+        tmp.append(n)
+        data.append(tmp)
+    data.sort(reverse=True)
+    result = []
+    for dat in data:
+        y, x, l, num = dat
+        h = lst.prod(x, x + l)
+        lst.apply(x, x + l, h + 1)
+        result.append([num, H - h])
+    result.sort()
+    for r in result:
+        print(r[1])
+
+
+if __name__ == "__main__":
+    _example_main()
