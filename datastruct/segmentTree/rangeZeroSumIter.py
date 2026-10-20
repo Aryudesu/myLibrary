@@ -8,10 +8,22 @@ class RangeZeroSumIter:
     - zero(l, r): A[l:r] = 0
     - sum(l, r): A[l:r] の総和
     - point_set(i, v): A[i] = v
+    - RangeZeroSumIter(n): 長さ n のゼロ配列
+    - RangeZeroSumIter(values): 初期配列から O(N) 構築
     """
     __slots__ = ("n", "size", "log", "seg", "lazy")
 
-    def __init__(self, n: int):
+    def __init__(self, n: int | list[int]):
+        """
+        n が整数なら長さ n のゼロ配列で初期化する。
+        リストならその値で初期化する（O(N) で構築）。
+        """
+        if isinstance(n, int):
+            values = None
+        else:
+            values = list(n)
+            n = len(values)
+
         self.n = n
         size = 1
         log = 0
@@ -22,6 +34,11 @@ class RangeZeroSumIter:
         self.log = log
         self.seg = [0] * (2 * size)
         self.lazy = [False] * (2 * size)
+
+        if values is not None:
+            self.seg[size:size + n] = values
+            for k in range(size - 1, 0, -1):
+                self.seg[k] = self.seg[k << 1] + self.seg[k << 1 | 1]
 
     def _apply_zero(self, k: int):
         seg = self.seg

@@ -13,7 +13,13 @@ class RangeAddArgMin:
 
     INF = 10**30
 
-    def __init__(self, n: int):
+    def __init__(self, n: int | list[int]):
+        """整数ならゼロ配列、リストならその値から O(N) 構築。"""
+        if isinstance(n, int):
+            values = [0] * n
+        else:
+            values = list(n)
+            n = len(values)
         self.n = n
         self.size = 1
         while self.size < n:
@@ -24,7 +30,7 @@ class RangeAddArgMin:
         self.lazy = [0] * (2 * self.size)
 
         for i in range(n):
-            self.min_val[self.size + i] = 0
+            self.min_val[self.size + i] = values[i]
             self.arg[self.size + i] = i
 
         for i in range(self.size - 1, 0, -1):
