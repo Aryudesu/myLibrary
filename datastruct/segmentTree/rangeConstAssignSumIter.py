@@ -7,7 +7,13 @@ class RangeConstAssignSumIter:
     """
     __slots__ = ("n", "size", "log", "seg", "lazy_flag", "length", "C")
 
-    def __init__(self, n: int, C: int, init: list[int] | None = None) -> None:
+    def __init__(self, n: int | list[int], C: int, init: list[int] | None = None) -> None:
+        """整数なら従来どおり、リストなら O(N) で構築。"""
+        if not isinstance(n, int):
+            if init is not None:
+                raise ValueError("配列を渡す場合は init を指定しないでください")
+            init = list(n)
+            n = len(init)
         self.n = n
         self.C = C
         size = 1
