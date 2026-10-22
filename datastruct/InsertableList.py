@@ -13,6 +13,8 @@ class InsertableList:
     popleft           期待 O(log N)
     pop               期待 O(log N)
     添字アクセス      期待 O(log N)
+    添字更新          期待 O(log N)
+    全要素の反復      O(N)
     """
 
     __slots__ = (
@@ -167,28 +169,43 @@ class InsertableList:
         self.root = self._merge(a, c)
         return self.value[target]
 
-    def __getitem__(self, index):
+    def _get_node(self, index):
+        """指定添字のノードIDを返す。負の添字対応。期待 O(log N)。"""
         n = len(self)
-
         if index < 0:
             index += n
-
         if not 0 <= index < n:
             raise IndexError("InsertableList index out of range")
 
         node = self.root
-
         while node:
             left_size = self.size[self.left[node]]
-
             if index < left_size:
                 node = self.left[node]
             elif index == left_size:
-                return self.value[node]
+                return node
             else:
                 index -= left_size + 1
                 node = self.right[node]
 
         raise IndexError("InsertableList index out of range")
 
+    def __getitem__(self, index):
+        """添字による取得。期待 O(log N)。"""
+        return self.value[self._get_node(index)]
 
+    def __setitem__(self, index, x):
+        """添字による更新。期待 O(log N)。"""
+        self.value[self._get_node(index)] = x
+
+    def __iter__(self):
+        """全要素を先頭から順に走査する。O(N) 時間。"""
+        stack = []
+        node = self.root
+        while stack or node:
+            while node:
+                stack.append(node)
+                node = self.left[node]
+            node = stack.pop()
+            yield self.value[node]
+            node = self.right[node]
