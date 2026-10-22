@@ -1,9 +1,7 @@
-import math
-
 class arrayUtility:
     """配列で便利な機能等まとめたい"""
-    def __init__(self, a: list = []):
-        self.data = a
+    def __init__(self, a: list | None = None):
+        self.data = list(a) if a is not None else []
 
     def append(self, d):
         self.data.append(d)
@@ -40,5 +38,6 @@ class arrayUtility:
             result.append(result[i] + self.data[i])
         return result
 
-data = arrayUtility([3, 1, 2, 5, 4])
-print(data.prefix_sum())
+if __name__ == "__main__":
+    data = arrayUtility([3, 1, 2, 5, 4])
+    print(data.prefix_sum())
