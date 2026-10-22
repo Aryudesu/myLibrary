@@ -1,8 +1,8 @@
 class StackData:
-    def __init__(self, A=[]):
+    def __init__(self, A=None):
         self.pointer = -1
         self.data = []
-        for a in A:
+        for a in (A if A is not None else ()):
             self.data.append(a)
             self.pointer += 1
 
@@ -34,12 +34,10 @@ class StackData:
         return self.data[index]
 
 class RollBackUnionFind:
-    data = []
-    history = StackData()
-    inner_snap = 0
-
     def __init__(self, size: int = 0):
         self.data = [-1] * size
+        self.history = StackData()
+        self.inner_snap = 0
 
     def merge(self, x: int, y: int)-> bool:
         """集合の結合"""
@@ -71,6 +69,8 @@ class RollBackUnionFind:
 
     def undo(self):
         """直前の操作取り消し"""
+        if self.history.size() < 2:
+            raise IndexError("undo from empty RollBackUnionFind history")
         self.data[self.history.getLast()[0]] = self.history.getLast()[1]
         self.history.pop()
         self.data[self.history.getLast()[0]] = self.history.getLast()[1]
@@ -95,34 +95,35 @@ class RollBackUnionFind:
             self.undo()
 
 
-# ====== ABC264E ======
-N, M, E = [int(l) for l in input().split()]
-UV = []
-for e in range(E):
-    UV.append([int(l) - 1 for l in input().split()])
-
-Q = int(input())
-X = []
-Xset = set()
-for q in range(Q):
-    x = int(input()) - 1
-    X.append(x)
-    Xset.add(x)
-X.reverse()
-rbuf = RollBackUnionFind(N + M)
-for m in range(M - 1):
-    rbuf.merge(N + m, N + m + 1)
-
-for e in range(E):
-    if e in Xset:
-        continue
-    u, v = UV[e]
-    rbuf.merge(u, v)
-
-for q in range(Q):
-    u, v = UV[X[q]]
-    rbuf.merge(u, v)
-
-for q in range(Q):
-    rbuf.undo()
-    print(rbuf.size(N) - M)
+if __name__ == "__main__":
+    # ====== ABC264E ======
+    N, M, E = [int(l) for l in input().split()]
+    UV = []
+    for e in range(E):
+        UV.append([int(l) - 1 for l in input().split()])
+    
+    Q = int(input())
+    X = []
+    Xset = set()
+    for q in range(Q):
+        x = int(input()) - 1
+        X.append(x)
+        Xset.add(x)
+    X.reverse()
+    rbuf = RollBackUnionFind(N + M)
+    for m in range(M - 1):
+        rbuf.merge(N + m, N + m + 1)
+    
+    for e in range(E):
+        if e in Xset:
+            continue
+        u, v = UV[e]
+        rbuf.merge(u, v)
+    
+    for q in range(Q):
+        u, v = UV[X[q]]
+        rbuf.merge(u, v)
+    
+    for q in range(Q):
+        rbuf.undo()
+        print(rbuf.size(N) - M)
