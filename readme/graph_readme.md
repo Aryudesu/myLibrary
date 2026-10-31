@@ -16,6 +16,33 @@
 
 Euler Tour や LCA が不要な場合はこちらを使う。
 
+## graph/tree_diameter
+
+`Tree` を継承した直径・中心・離心率ユーティリティ（0-indexed）。
+`add_edge(u, v, weight=1)` で辺を追加し、`build()` で解析する。
+
+- `diameter_length`：直径長
+- `endpoints`：直径の端点
+- `path`：直径パスの頂点列
+- `centers` / `radius`：頂点に限定した中心と半径
+- `eccentricities`：全頂点の離心率
+- `peripheral_vertices`：直径の端点になれる全頂点
+- `dist_from_u` / `dist_from_v`：直径端点からの距離
+- `get_eccentricity(v)` / `is_peripheral(v)`
+
+辺重みは非負を想定。重み付き木では中心が必ずしも1〜2頂点とは限らない。
+計算量は `build()` が `O(N)` 時間・空間。
+
+```python
+from graph.tree_diameter import TreeDiameter
+
+td = TreeDiameter(5)
+for u, v in [(0, 1), (1, 2), (1, 3), (3, 4)]:
+    td.add_edge(u, v)
+td.build()
+print(td.diameter_length, td.centers, td.peripheral_vertices)
+```
+
 ## graph/euler_tour
 
 `Tree` を継承した Euler Tour + RMQ による根付き木ユーティリティ。
