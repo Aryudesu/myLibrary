@@ -177,6 +177,22 @@ class WaveletMatrix:
 
         return cnt
 
+    def rangeFreqGE(self, l: int, r: int, lower: int) -> int:
+        """[l, r) で lower 以上の値の個数"""
+        return (r - l) - self.rangeFreq(l, r, lower)
+
+    def rangeFreqGT(self, l: int, r: int, lower: int) -> int:
+        """[l, r) で lower より大きい値の個数"""
+        return (r - l) - self.rangeFreq(l, r, lower + 1)
+
+    def rangeFreqLE(self, l: int, r: int, upper: int) -> int:
+        """[l, r) で upper 以下の値の個数"""
+        return self.rangeFreq(l, r, upper + 1)
+
+    def rangeCount(self, l: int, r: int, value: int) -> int:
+        """[l, r) で value に等しい値の個数"""
+        return self.rangeFreq(l, r, value + 1) - self.rangeFreq(l, r, value)
+
     def rangeFreqRange(self, l: int, r: int, lower: int, upper: int) -> int:
         return self.rangeFreq(l, r, upper) - self.rangeFreq(l, r, lower)
 
