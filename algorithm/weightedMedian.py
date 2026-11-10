@@ -29,3 +29,9 @@ def weightedMedian(values, weights):
             return value
 
     raise RuntimeError("unreachable")
+
+
+def weightedMedianCost(values, weights):
+    """重み付き絶対距離和の最小値を返す。計算量 O(N log N)。"""
+    center = weightedMedian(values, weights)
+    return sum(w * abs(v - center) for v, w in zip(values, weights))
