@@ -103,9 +103,7 @@ Hilbert index の計算自体にもコストがあるため、常に高速にな
 非負重みの絶対距離和 `sum(w[i] * abs(x - values[i]))` を最小化する
 重み付き中央値を返す。最適解が区間になる場合は左端を返す。
 `Fraction` など比較できる有理数にも対応。重み総和 0 は `ValueError`。
-計算量は `O(N log N)`。
-
-## treeImos.py
+追加の `weightedMedianCost(values, weights)` は最小距離和を返す。\n計算量はどちらも `O(N log N)`。\n\n## minCostIntervalCover.py\n\n`minCostIntervalCover(n, intervals, restore=False)`\n\n閉区間 `(l, r, cost)` を選んで区画 `[1, n]` を最小費用で覆う。\n区間の重複は許され、費用は非負。不可能な場合は `-1`。\n`restore=True` なら `(費用, 選択した区間の0-indexed入力番号)` を返す。\n右端順DPと区間minセグメント木を用いる。\n計算量 `O(n + m log m + m log n)`。\n\n## treeImos.py
 
 `TreeImos(graph, root=0)`
 
