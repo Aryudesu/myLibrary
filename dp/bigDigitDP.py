@@ -282,17 +282,96 @@ class BigDigitDP:
 
         return ans_cnt, ans_sum
 
-MOD = 1_000_000_007
-D = int(input())
-N = input()
 
-def transition(state, d, started):
-    if not started:
-        return state
-    return (state + d) % D
+    def aggregate(
+        self,
+        init_state: Hashable,
+        transition: Callable[[Hashable, int, bool], Hashable | None],
+        update: Callable[[Hashable, int, bool, tuple[int, ...]], tuple[int, ...]],
+        accept: Callable[[Hashable, bool], bool],
+        initial: tuple[int, ...] = (1, 0),
+    ) -> tuple[int, ...]:
+        """
+        0 <= x <= N の桁DPで複数の加算可能な統計量をまとめて計算する。
 
-def accept(state, started):
-    return started and state == 0
+        dp[(state, tight, started)] は統計量のタプルを保持する。
+        同じ状態に到達した経路のタプルは成分ごとに加算される。
 
-dp = BigDigitDP(N, mod=MOD)
-print(dp.count(0, transition, accept))
+        initial:
+            空の接頭辞が持つ統計量。
+            例: (個数, 評価値の総和, 補助統計量の総和, ...)
+
+        transition(state, digit, started):
+            遷移先の状態。None ならその遷移は使用しない。
+
+        update(state, digit, started, values):
+            遷移前の状態と統計量 values から遷移後の統計量を返す。
+            values は同じ state に至る全経路の統計量を集計したもの。
+            したがって集計量に対して線形な更新を行うこと。
+            例: sum' = 10 * sum + digit * count
+
+        accept(state, started):
+            最後に答えへ加算する状態を選ぶ。
+
+        戻り値:
+            受理した状態の統計量を成分ごとに合計したタプル。
+
+        注意:
+            update が成分ごとの和と可換でない場合、同じ状態へ
+            まとめたときの情報が失われるので state を増やして区別する。
+        """
+        if not initial:
+            raise ValueError("initial must contain at least one statistic")
+
+        width = len(initial)
+        mod = self.mod
+        dp = {(init_state, True, False): initial}
+        empty = (0,) * width
+
+        for limit_digit in self.digits:
+            ndp = {}
+            for (state, tight, started), values in dp.items():
+                upper = limit_digit if tight else 9
+                for digit in range(upper + 1):
+                    ntight = tight and digit == limit_digit
+                    nstarted = started or digit != 0
+                    nstate = transition(state, digit, nstarted)
+                    if nstate is None:
+                        continue
+
+                    updated = tuple(update(state, digit, nstarted, values))
+                    if len(updated) != width:
+                        raise ValueError("update must preserve the number of statistics")
+                    key = (nstate, ntight, nstarted)
+                    previous = ndp.get(key, empty)
+                    if mod is None:
+                        ndp[key] = tuple(a + b for a, b in zip(previous, updated))
+                    else:
+                        ndp[key] = tuple((a + b) % mod for a, b in zip(previous, updated))
+            dp = ndp
+
+        answer = [0] * width
+        for (state, _, started), values in dp.items():
+            if accept(state, started):
+                for i, value in enumerate(values):
+                    answer[i] += value
+                    if mod is not None:
+                        answer[i] %= mod
+        return tuple(answer)
+
+if __name__ == "__main__":
+    MOD = 1_000_000_007
+    D = int(input())
+    N = input()
+    
+    def transition(state, d, started):
+        if not started:
+            return state
+        return (state + d) % D
+    
+    def accept(state, started):
+        return started and state == 0
+    
+    dp = BigDigitDP(N, mod=MOD)
+    print(dp.count(0, transition, accept))
+    
