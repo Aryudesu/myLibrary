@@ -19,3 +19,23 @@
   - 隣り合わない要素をちょうど `K` 個選ぶときの最大和。
 
 heap と双方向連結リストによる後悔貪欲を用い、計算量は `O((N + K) log N)`。
+
+## bitsetSubsetSum.py
+
+- `BitsetSubsetSum(max_sum=None)`: 非負整数の部分和の到達可能性を Python の整数のビットで高速に管理。
+  - `add(x)`: 非負整数 `x` を1個追加する。
+  - `contains(s)` / `s in dp`: 部分和 `s` が作れるか。
+  - `max_leq(x)`: `x` 以下で作れる最大の部分和（なければ `None`）。
+  - `min_geq(x)`: `x` 以上で作れる最小の部分和（なければ `None`）。
+  - `max_sum` を指定するとその値を超える部分和を捨て、メモリと時間を節約できる。ただし問い合わせも保存範囲内のみ。削除・通り数計算には対応しない。
+
+例（AWC0201 E、2人の荷物の重量差の最小値）:
+
+```python
+S = sum(A)
+dp = BitsetSubsetSum(S // 2)
+for a in A:
+    dp.add(a)
+best = dp.max_leq(S // 2)
+print(S - 2 * best)
+```
