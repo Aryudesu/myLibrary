@@ -39,3 +39,31 @@ for a in A:
 best = dp.max_leq(S // 2)
 print(S - 2 * best)
 ```
+
+
+## tspBitDP.py
+
+- `TSPBitDP(dist)`: 距離行列から巡回セールスマン問題をBitDPで解く。
+  - `dist[i][j]`: 頂点 `i` → `j` の移動コスト（非対称でも可）。
+  - `solve(start_cost, end_cost=None)`: 全頂点を訪問する最小コスト。
+  - `start_cost[i]`: 始点から最初の頂点 `i` へのコスト。
+  - `end_cost[i]`: 最後の頂点 `i` から終点へのコスト。省略時は終点自由。
+  - 頂点数0なら0を返す。始点から終点への直接移動コストは含まない。
+  - 時間 `O(N^2 2^N)`、空間 `O(N 2^N)`。頂点数が小さい場合向け。
+
+例（AWC0202 E、配達先を全訪問して原点に戻る）:
+
+```python
+from dp.tspBitDP import TSPBitDP
+
+N, M, K = map(int, input().split())
+RC = [tuple(int(x) - 1 for x in input().split()) for _ in range(K)]
+
+dist = [
+    [abs(r1 - r2) + abs(c1 - c2) for r2, c2 in RC]
+    for r1, c1 in RC
+]
+start_cost = [r + c for r, c in RC]
+
+print(TSPBitDP(dist).solve(start_cost, start_cost))
+```
