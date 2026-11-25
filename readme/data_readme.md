@@ -110,3 +110,18 @@ Trieクラスの作成を行います．
 - `get(i)` : `i` 番目の値
 
 構築 `O(N)`、更新・取得 `O(log N)`。
+
+## occurrenceIndex.py
+
+`OccurrenceIndex(A)`
+
+静的配列の値ごとの出現位置を管理する。値は hashable、0-index、半開区間。
+
+- `getPositions(x)`: 出現位置のタプル（未出現なら空）
+- `count(l, r, x)`: 区間内の出現回数
+- `prev(i, x)`: i 未満の最後の位置（なければ -1）
+- `next(i, x)`: i より後の最初の位置（なければ N）
+- `kth(l, r, x, k)`: 区間内の k 番目の位置（0-index、なければ -1）
+- `countExactK(l, r, x, k)`: 区間内で x をちょうど k 個含む非空部分区間数（k=0 対応）
+
+構築・空間 O(N)、位置一覧取得 O(1) 平均、二分探索 O(log N)、countExactK O(log N + f)（f は区間内の出現回数）。
