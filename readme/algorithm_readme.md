@@ -115,3 +115,17 @@ Hilbert index の計算自体にもコストがあるため、常に高速にな
 - `build()`: 全頂点の加算結果を取得
 
 非再帰 DFS。初期化・集計 `O(N)`、加算 `O(1)`。
+
+## weightedCompletionScheduler.py
+
+`WeightedCompletionScheduler`
+
+Smith's rule により単一機械の重み付き完了時刻の総和を最小化する。
+所要時間は正整数、重みは非負整数。Fraction による厳密比較。
+
+- `add(time, weight)`: タスク追加、0-index の登録番号を返す
+- `getOrder()`: 最適処理順の登録番号一覧（同率は登録順）
+- `getCompletionTimes()`: 登録番号順の完了時刻
+- `getMinCost()`: 最小コスト
+
+追加 O(1) 償却、取得 O(N log N)、空間 O(N)。
