@@ -43,10 +43,12 @@ class FunctionalGraph:
 
         queue = deque(v for v in range(self.n) if indegree[v] == 0)
         removed = [False] * self.n
+        self.topological_order = []
 
         while queue:
             v = queue.popleft()
             removed[v] = True
+            self.topological_order.append(v)
             nv = self.to[v]
             indegree[nv] -= 1
             if indegree[nv] == 0:
@@ -222,3 +224,24 @@ class FunctionalGraph:
         self._validate_vertex(start)
         self._validate_vertex(v)
         return self.cycle_id[start] == self.cycle_id[v] and self.in_cycle[v]
+
+
+    def getTopologicalOrder(self) -> list[int]:
+        """サイクル外の頂点を葉から送り先へ処理する順序。O(N)。"""
+        return self.topological_order[:]
+
+    def aggregate(self, weights):
+        """サイクル辺を除いて重みを送り先へ集約する。O(N)。
+        cnt[v]: v に流入する部分木の重み総和。
+        cost[v]: その重みと v までの有向距離の積の総和。
+        戻り値 (cnt, cost)。サイクル上では入口ごとの集約値となる。
+        """
+        cnt = list(weights)
+        if len(cnt) != self.n:
+            raise ValueError("weights length mismatch")
+        cost = [0]*self.n
+        for v in self.topological_order:
+            u = self.to[v]
+            cnt[u] += cnt[v]
+            cost[u] += cost[v] + cnt[v]
+        return cnt, cost

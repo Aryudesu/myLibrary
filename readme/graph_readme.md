@@ -112,3 +112,16 @@ Functional Graph とは用途が異なるため別クラスとして管理する
 - `restore_path(prev, start, goal)` : 最短路を復元する
 
 頂点数が事前に分かる AtCoder 向け。計算量は `O((N + M) log N)`。
+
+
+## FunctionalGraph の重み集約
+
+既存 FunctionalGraph に getTopologicalOrder() と aggregate(weights) を追加。
+サイクル辺を除いた葉から根への順序、各頂点への重み総和と距離付き重み総和を取得する。
+どちらも O(N)。円環上の距離和は circularWeightedDistance と組み合わせられる。
+
+## graph/treeKDominatingSet
+
+`TreeKDominatingSet(graph, A, k=2).solve(root=0)`：
+非選択頂点の隣接頂点のうち少なくとも k 個が選択される条件で、選択費用の総和を最小化。
+k は頂点別配列でも可。非再帰、固定 k で O(N)、一般には O(N log(min(K,N)+2))。

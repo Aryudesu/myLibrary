@@ -67,3 +67,17 @@ start_cost = [r + c for r, c in RC]
 
 print(TSPBitDP(dist).solve(start_cost, start_cost))
 ```
+
+
+## adjacentSelectionDP.py
+
+`AdjacentSelectionDP(k, predicate=lambda a,b: a==b, mod=998244353)`
+各位置で候補から1つ選び、隣接条件の成立回数がちょうど k 以下の各場合の数を管理する。
+`step(choices)`、`get(count)`。重複候補を区別。mod=None は厳密整数。
+1回の遷移 O((k+1)*前回候補数*今回候補数)。
+
+## moduloSelectionDP.py
+
+`ModuloSelectionDP(m, mod=998244353)`：選択した整数の総和の剰余別の通り数。
+`step([a,-b])`、`get(x)`。重複・負数可。mod=None は厳密整数。
+候補数 L の遷移 O(m*(L+1))、2候補専用の高速経路あり。

@@ -129,3 +129,17 @@ Smith's rule により単一機械の重み付き完了時刻の総和を最小�
 - `getMinCost()`: 最小コスト
 
 追加 O(1) 償却、取得 O(N log N)、空間 O(N)。
+
+
+## circularWeightedDistance.py
+
+`circularWeightedDistance(W)` / `CircularWeightedDistance(W)`：
+各終点 x について sum(W[i]*((x-i)%N)) を O(N) で計算。
+辺は i -> (i+1)%N。クラスは get(x), getAll() を提供。
+
+## atLeastKSelection.py
+
+`AtLeastKSelection(pairs=())`：有限整数の費用 (a,b) から一方を選ぶ。
+add(a,b)、getMinCostExactly(k)、getMinCostAtLeast(k)。
+不可能なら inf。追加 O(1)、初回クエリ O(N log N)、以後 O(1)。
+単発用 solveAtLeast(pairs,k) は小さい固定 k なら O(N)。
